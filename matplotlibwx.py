@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 # matplotlibwx.py
 # by Yukiharu Iwamoto
-# 2022/6/2 9:20:43 PM
+# 2022/6/22 4:45:12 PM
 
 # Macの場合，文字入力後に引用符が勝手に変わったりしてうまく動かない．
 # 「システム環境設定」→「キーボード」→「ユーザー辞書」→「スマート引用符とスマートダッシュを使用」のチェックを外す．
 
-version = '2022/6/2 9:20:43 PM'
+version = '2022/6/22 4:45:12 PM'
 
 import os
 languages = os.environ.get('LANG')
@@ -354,9 +354,17 @@ def data_from_file(file_name, columns = (1, 2), every = 1, skip = '#', delimiter
                     break
             columns1.append(s)
         data = [[] for i in range(len(columns1))]
-        wb = xlrd.open_workbook(file_name)
-        lines = [[wb.sheet_by_index(i).row_values(j)
-            for j in range(wb.sheet_by_index(i).nrows)] for i in range(wb.nsheets)]
+        if file_name.endswith(u'.xls'):
+            wb = xlrd.open_workbook(file_name)
+            lines = [[wb.sheet_by_index(i).row_values(j)
+                for j in range(wb.sheet_by_index(i).nrows)] for i in range(wb.nsheets)]
+            # https://stackoverflow.com/questions/33241837/python-xlrd-book-how-to-close-the-files
+            wb.release_resources()
+            del wb
+        else: # .xlsx
+            wb = openpyxl.load_workbook(file_name)
+            lines = [[[v.value for v in row] for row in ws.rows] for ws in wb.worksheets]
+            wb.close()
         n_lines = None
         for i in columns1:
             for j in i:
