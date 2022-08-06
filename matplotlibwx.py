@@ -758,7 +758,7 @@ def plot_scatter(data, err = (None, None), ranges = (None, None), ticks = (None,
 
 def plot_vector(data, ranges = (None, None, None), ticks = (None, None, None), log_scale = (False, False, False),
     fig_size = None, aspect = 'auto', graph_edges = None, title = None, labels = None, grids = (False, False),
-    color = 'black', scale = 1.0, legend = (0.5, 1.03, 1.0, None), zorder = 0):
+    color = 'black', scale = 1.0, legend = (0.8, 1.03, 1.0, None), zorder = 0):
     # fig_size = None | tuple | 'reflesh'
     # aspect = None | 'auto' | 'equal' | number
     # graph_edges = None | (left, bottom, right, top)
