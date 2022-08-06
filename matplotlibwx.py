@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 # matplotlibwx.py
 # by Yukiharu Iwamoto
-# 2022/6/22 4:45:12 PM
+# 2022/8/6 6:15:34 PM
 
 # Macの場合，文字入力後に引用符が勝手に変わったりしてうまく動かない．
 # 「システム環境設定」→「キーボード」→「ユーザー辞書」→「スマート引用符とスマートダッシュを使用」のチェックを外す．
 
-version = '2022/6/22 4:45:12 PM'
+version = '2022/8/6 6:15:34 PM'
 
 import os
 languages = os.environ.get('LANG')
@@ -758,11 +758,12 @@ def plot_scatter(data, err = (None, None), ranges = (None, None), ticks = (None,
 
 def plot_vector(data, ranges = (None, None, None), ticks = (None, None, None), log_scale = (False, False, False),
     fig_size = None, aspect = 'auto', graph_edges = None, title = None, labels = None, grids = (False, False),
-    color = 'black', scale = 1.0, zorder = 0):
+    color = 'black', scale = 1.0, legend = (0.5, 1.03, 1.0, None), zorder = 0):
     # fig_size = None | tuple | 'reflesh'
     # aspect = None | 'auto' | 'equal' | number
     # graph_edges = None | (left, bottom, right, top)
     # color = 'len' | 'len1' | color name
+    # legend = (x, y, u, 'label') | None
     common_setting(data, ranges, ticks, log_scale, fig_size, aspect, graph_edges, title, labels, grids)
     if color == 'len' or color == 'len1' or len(data) > 4:
         if color == 'len':
@@ -835,7 +836,11 @@ def plot_vector(data, ranges = (None, None, None), ticks = (None, None, None), l
     else:
         quiv = plt.quiver(data[0], data[1], data[2], data[3], angles = 'xy', scale_units = 'xy',
             scale = 1.0/scale, color = color, zorder = zorder)
-#    plt.quiverkey(quiv, 0.5, 0.5, 370/2*0.5, r'$\mathsf{u/U_m = 1}$', coordinates = 'axes', labelpos = 'E')
+    if legend is not None:
+        plt.quiverkey(quiv, X = legend[0], Y = legend[1], U = 184.0*legend[2],
+            label = '{}{}'.format('' if legend[2] == 1 else legend[2], legend[3] if legend[3] is not None else ''),
+            coordinates = 'axes', labelpos = 'E')
+#    plt.quiverkey(quiv, 0.5, 1.01, U = 184.0, label = r'$\mathsf{u/U_m = 1}$', coordinates = 'axes', labelpos = 'E')
 #    "The scale_units='xy' case is not being handled correctly by Quiverkey,"
 #    stated in https://github.com/matplotlib/matplotlib/issues/13616
 
@@ -1269,43 +1274,49 @@ def make_template(file_name = u'template.txt'):
             u"#     → 画面左/下端を0，右/上端を1とした座標に対して，グラフの右端を0.7に指定する\n")
         f.write(u"# 'graph_edges': None # → グラフの端を指定しない\n")
         f.write(u"    'graph_edges': None,\n")
-        f.write(u"# 'texts': (('axes', 0.1, 0.8, 'l', r'$\\mathsf{a/b}$', %g, %d),\n" % (plt.rcParams['font.size'], zorder_others) +
-            u"#           ('data', 0.5, 0.1, 'c', r'exp.', %g, %d),\n"  % (plt.rcParams['font.size'], zorder_others) +
-            u"#           ('data', 0.7, 0.9, 'r', r'theory', %g, %d),)\n" % (plt.rcParams['font.size'] + 2.0, zorder_others + 1) +
+        f.write(u"# 'texts': (('axes', 0.1, 0.8, 'l', r'$\\mathsf{a/b}$', " +
+            u"{:g}, {:d}),\n".format(plt.rcParams['font.size'], zorder_others) +
+            u"#           ('data', 0.5, 0.1, 'c', r'exp.', {:g}, {:d}),\n".format(
+                plt.rcParams['font.size'], zorder_others) +
+            u"#           ('data', 0.7, 0.9, 'r', r'theory', {:g}, {:d}),)\n".format(
+                plt.rcParams['font.size'] + 2.0, zorder_others + 1) +
             u"#     → axes座標で(0.1, 0.8), data座標で(0.5, 0.1), data座標で(0.7, 0.9)の場所に\n"
-            u"#       それぞれ左揃え，中央揃え，右揃え，zorder = %d, %d, %d，サイズ%g, %g, %gの文字を書く\n" %
-            (zorder_others, zorder_others, zorder_others + 1,
-            plt.rcParams['font.size'], plt.rcParams['font.size'],
-            plt.rcParams['font.size'] + 2.0) +
+            u"#       それぞれ左揃え，中央揃え，右揃え，zorder = {:d}, {:d}, {:d}，".format(
+                zorder_others, zorder_others, zorder_others + 1) +
+            u"サイズ{:g}, {:g}, {:g}の文字を書く\n".format(
+                plt.rcParams['font.size'], plt.rcParams['font.size'], plt.rcParams['font.size'] + 2.0) +
             u"#     * axes座標はグラフ枠の左下を(0, 0), 右上を(1, 1)にとる座標，data座標はふつうのx, y座標\n")
         f.write(u"# 'texts': None # 書く文字はない\n")
-        f.write(u"    'texts': (('axes', 0.05, 0.9, 'l', r'test', %g, %d),),\n" % (plt.rcParams['font.size'], zorder_others))
-        f.write(u"# 'arrows': (('axes', 0.1, 0.2, 0.4, 0.3, 2.0, '-', 5.0, %d),\n" % zorder_others +
-            u"#            ('data', 0.1, 0.3, 0.4, 0.4, 1.0, '--', 0.0, %d),)\n" % (zorder_others + 1) +
-            u"#     → axes座標で(0.1, 0.2)から(0.4, 0.3)に線幅2.0，実線，矢の幅5.0，zorder = %dの矢印，\n" % zorder_others +
-            u"#       data座標で(0.1, 0.3)から(0.4, 0.4)に線幅1.0，破線，矢の幅0.0，zorder = %dの矢印(=直線)を描く\n" % (zorder_others + 1) +
+        f.write(u"    'texts': (('axes', 0.05, 0.9, 'l', r'test', {:g}, {:d}),),\n".format(
+            plt.rcParams['font.size'], zorder_others))
+        f.write(u"# 'arrows': (('axes', 0.1, 0.2, 0.4, 0.3, 2.0, '-', 5.0, {:d}),\n".format(zorder_others) +
+            u"#            ('data', 0.1, 0.3, 0.4, 0.4, 1.0, '--', 0.0, {:d}),)\n".format(zorder_others + 1) +
+            u"#     → axes座標で(0.1, 0.2)から(0.4, 0.3)に線幅2.0，実線，矢の幅5.0，" +
+            u"zorder = {:d}の矢印，\n".format(zorder_others) +
+            u"#       data座標で(0.1, 0.3)から(0.4, 0.4)に線幅1.0，破線，矢の幅0.0，" +
+            u"zorder = {:d}の矢印(=直線)を描く\n".format(zorder_others + 1) +
             u"#     * axes座標はグラフ枠の左下を(0, 0), 右上を(1, 1)にとる座標，data座標はふつうのx, y座標\n" +
             u"#     * 線種の指定方法は散布図のline_styleと同じ\n")
         f.write(u"# 'arrows': None # 描く矢印はない\n")
-        f.write(u"    'arrows': (('axes', 0.1, 0.2, 0.4, 0.3, 2.0, ':', 24.0, %d),),\n" % zorder_others)
-        f.write(u"# 'ellipses': (('data', 0.1, 0.2, 0.6, 0.4, 20.0, 1.0, True, %d),)\n" % zorder_others +
+        f.write(u"    'arrows': (('axes', 0.1, 0.2, 0.4, 0.3, 2.0, ':', 24.0, {:d}),),\n".format(zorder_others))
+        f.write(u"# 'ellipses': (('data', 0.1, 0.2, 0.6, 0.4, 20.0, 1.0, True, {:d}),)\n".format(zorder_others) +
             u"#     → data座標で(0.1, 0.2)に中心があり，data座標で幅0.6，高さ0.4で20.0度反時計回りに回転させた線幅1.0，\n" +
-            u"#       塗りつぶしあり，zorder = %dの楕円を描く\n" % zorder_others +
+            u"#       塗りつぶしあり，zorder = {:d}の楕円を描く\n".format(zorder_others) +
             u"#     * axes座標はグラフ枠の左下を(0, 0), 右上を(1, 1)にとる座標，data座標はふつうのx, y座標\n")
         f.write(u"# 'ellipses': None # 描く楕円はない\n")
-        f.write(u"    'ellipses': (('axes', 0.8, 0.4, 0.2, 0.1, 45.0, 1.0, False, %d),),\n" % zorder_others)
-        f.write(u"# 'polygons': (('data', [0.1, 0.1, 0.3, 0.1, 0.2, 0.4], 1.0, False, %d),)\n" % zorder_others +
+        f.write(u"    'ellipses': (('axes', 0.8, 0.4, 0.2, 0.1, 45.0, 1.0, False, {:d}),),\n".format(zorder_others))
+        f.write(u"# 'polygons': (('data', [0.1, 0.1, 0.3, 0.1, 0.2, 0.4], 1.0, False, {:d}),)\n".format(zorder_others) +
             u"#     → data座標で(0.1, 0.1), (0.3, 0.1), (0.2, 0.4)に頂点があり，線幅1.0，塗りつぶしなし，" +
-            u"zorder = %dの多角形を描く\n" % zorder_others +
+            u"zorder = {:d}の多角形を描く\n".format(zorder_others) +
             u"#     * axes座標はグラフ枠の左下を(0, 0), 右上を(1, 1)にとる座標，data座標はふつうのx, y座標\n")
         f.write(u"# 'polygons': None # 描く多角形はない\n")
-        f.write(u"    'polygons': (('axes', [0.2, 0.2, 0.2, 0.4, 0.3, 0.3], 1.5, True, %d),),\n" % zorder_others)
-        f.write(u"# 'naca4': (('2412', 'axes', 0.1, 0.1, 0.3, 0.1, 1.0, True, %d),)\n" % zorder_others +
+        f.write(u"    'polygons': (('axes', [0.2, 0.2, 0.2, 0.4, 0.3, 0.3], 1.5, True, {:d}),),\n".format(zorder_others))
+        f.write(u"# 'naca4': (('2412', 'axes', 0.1, 0.1, 0.3, 0.1, 1.0, True, {:d}),)\n".format(zorder_others) +
             u"#     → axes座標で前縁，後縁がそれぞれ(0.1, 0.1), (0.3, 0.1)にあり，線幅1.0，塗りつぶしあり，\n" +
-            u"#       zorder = %dのNACA2412翼を描く\n" % zorder_others +
+            u"#       zorder = {:d}のNACA2412翼を描く\n".format(zorder_others) +
             u"#     * axes座標はグラフ枠の左下を(0, 0), 右上を(1, 1)にとる座標，data座標はふつうのx, y座標\n")
         f.write(u"# 'naca4': None # 描くNACA4桁系列翼はない\n")
-        f.write(u"    'naca4': (('4415', 'data', -0.6, 0.4, -0.1, 0.1, 1.2, True, %d),),\n" % zorder_others)
+        f.write(u"    'naca4': (('4415', 'data', -0.6, 0.4, -0.1, 0.1, 1.2, True, {:d}),),\n".format(zorder_others))
         f.write(u"# 'param_dict': {'a': 10.0, 'b': 2.2}\n" +
             u"#     → ファイル読み取り列指定を数式で行う際に，パラメータa, bをそれぞれ10.0, 2.2として使う\n")
         f.write(u"# 'param_dict': None # 使うパラメータはない\n")
@@ -1315,7 +1326,7 @@ def make_template(file_name = u'template.txt'):
         f.write(u"{\n")
         f.write(u"# 散布図\n")
         f.write(u"    'type': 'scatter',\n")
-        f.write(u"# " + u"%d" % zorder_min + u" ≤ zorder ≤ " + u"%d" % zorder_max + u"，zorderが大きいほど前面に描く\n")
+        f.write(u"# {:d} ≤ zorder ≤ {:d}，zorderが大きいほど前面に描く\n".format(zorder_min, zorder_max))
         f.write(u"    'zorder': 10,\n")
         f.write(u"# データファイル名，このファイルからの相対パス\n")
         f.write(u"    'file_name': '%s_example1.txt',\n" % s)
@@ -1372,7 +1383,7 @@ def make_template(file_name = u'template.txt'):
         f.write(u"{\n")
         f.write(u"# ベクトル線図\n")
         f.write(u"    'type': 'vector',\n")
-        f.write(u"# " + u"%d" % zorder_min + u" ≤ zorder ≤ " + u"%d" % zorder_max + u"，zorderが大きいほど前面に描く\n")
+        f.write(u"# {:d} ≤ zorder ≤ {:d}，zorderが大きいほど前面に描く\n".format(zorder_min, zorder_max))
         f.write(u"    'zorder': 2,\n")
         f.write(u"# ファイル名，このファイルからの相対パス\n")
         f.write(u"    'file_name': '%s_example2.xlsx',\n" % s)
@@ -1382,8 +1393,8 @@ def make_template(file_name = u'template.txt'):
             u"#     → 1列目の値/2列目の値，3列目の値の平方根*10, 3, 4列目の値をそれぞれx, y軸，u, vのデータに使う\n")
         f.write(u"# <エクセルファイル（拡張子がxlsまたはxlsx）またはcsvファイルの場合>\n")
         f.write(u"#  'columns': ('1!A2', '1!B2', 'sqrt(1!C2)', '1!D2')\n" +
-            u"#      → 1枚目のシートのセルA2から下の値，B2から下の値，C2から下の値の平方根，D2から下の値をそれぞれx, y軸，\n" +
-            u"#        u, vのデータに使う\n")
+            u"#     → 1枚目のシートのセルA2から下の値，B2から下の値，C2から下の値の平方根，D2から下の値をそれぞれx, y軸，\n" +
+            u"#       u, vのデータに使う\n")
         f.write(u"    'columns': ('1!A3', '1!B3', '1!D3', '1!E3'),\n")
         f.write(u"# 'every': 2 # → 2行毎にデータを読み込む\n")
         f.write(u"    'every': 1,\n")
@@ -1394,11 +1405,16 @@ def make_template(file_name = u'template.txt'):
         f.write(u"    'color': 'red',\n")
         f.write(u"# ベクトルの長さにかける倍率，大きいほど長く表示される\n")
         f.write(u"    'scale': 1.0,\n")
+        f.write(u"# legend: (0.8, 1.03, 1.0, r'$\mathsf{u/U_m}$')\n" +
+            u"#     → 矢印先端の横方向座標を0.8，縦方向座標を1.03として，長さ1.0の矢印で凡例を付ける\n" +
+            u"#       座標はグラフ左/下端を0，右/上端を1とした座標で指定する\n")
+        f.write(u"# legend: None # → 凡例を付けない\n")
+        f.write(u"    'legend': (0.8, 1.03, 1.0, r'V'),\n")
         f.write(u"},\n")
         f.write(u"{\n")
         f.write(u"# 等高線\n")
         f.write(u"    'type': 'contour',\n")
-        f.write(u"# " + u"%d" % zorder_min + u" ≤ zorder ≤ " + u"%d" % zorder_max + u"，zorderが大きいほど前面に描く\n")
+        f.write(u"# {:d} ≤ zorder ≤ {:d}，zorderが大きいほど前面に描く\n".format(zorder_min, zorder_max))
         f.write(u"    'zorder': 1,\n")
         f.write(u"# ファイル名，このファイルからの相対パス\n")
         f.write(u"    'file_name': '%s_example2.xlsx',\n" % s)
@@ -1427,7 +1443,7 @@ def make_template(file_name = u'template.txt'):
         f.write(u'#y = x\n')
         f.write(u'#x\ty\n')
         for x in np.arange(-1.0, 1.01, 0.1):
-            f.write(u'%g\t%g\n' % (x, x))
+            f.write(u'{:g}\t{:g}\n'.format(x, x))
     wb = openpyxl.Workbook()
     ws = wb.active
     ws.cell(row = 1, column = 1, value = 'x**2 + y**2')
@@ -1576,7 +1592,7 @@ class TableForGraph(MyTable):
             value = value.decode('UTF-8') if sys.version_info.major <= 2 and type(value) is str else value
             self.data[row][col] = None if value == u'' else value
 
-tooltip_zorder = (u'%d ≤ Z-order ≤ %d\n' % (zorder_min, zorder_max)) + _(u'大きいほど前面に描きます．')
+tooltip_zorder = (u'{:d} ≤ Z-order ≤ {:d}\n'.format(zorder_min, zorder_max)) + _(u'大きいほど前面に描きます．')
 tooltip_coordinate = _(u'axes座標はグラフ枠の左下を(0, 0), 右上を(1, 1)にとる座標，data座標はふつうのx, y座標')
 
 class TableForText(MyTable):
@@ -1596,7 +1612,7 @@ class TableForText(MyTable):
         self.tooltips = ((tooltip_coordinate, None, None, None, tooltip_tex, None, tooltip_zorder),)
         self.data_types = (wx.grid.GRID_VALUE_CHOICE + u':axes,data', wx.grid.GRID_VALUE_STRING, wx.grid.GRID_VALUE_STRING,
                            wx.grid.GRID_VALUE_CHOICE + _(u':左,中央,右'), wx.grid.GRID_VALUE_STRING, wx.grid.GRID_VALUE_STRING,
-                           wx.grid.GRID_VALUE_NUMBER + u':%d,%d' % (zorder_min, zorder_max))
+                           wx.grid.GRID_VALUE_NUMBER + u':{:d},{:d}'.format(zorder_min, zorder_max))
         self.new_data = ['axes', None, None, 'l', None, plt.rcParams['font.size'], zorder_others]
         self.data = [self.new_data[:], self.new_data[:], self.new_data[:]]
 
@@ -1661,7 +1677,7 @@ class TableForArrow(MyTable):
         self.data_types = (wx.grid.GRID_VALUE_CHOICE + u':axes,data', wx.grid.GRID_VALUE_STRING,
                            wx.grid.GRID_VALUE_STRING, wx.grid.GRID_VALUE_STRING, wx.grid.GRID_VALUE_STRING,
                            wx.grid.GRID_VALUE_STRING, wx.grid.GRID_VALUE_CHOICE + u':' + u','.join(line_styles_wx[:-1]),
-                           wx.grid.GRID_VALUE_STRING, wx.grid.GRID_VALUE_NUMBER + u':%d,%d' % (zorder_min, zorder_max))
+                           wx.grid.GRID_VALUE_STRING, wx.grid.GRID_VALUE_NUMBER + u':{:d},{:d}'.format(zorder_min, zorder_max))
         self.new_data = ['axes', None, None, None, None, 1.0, line_styles[0], 12.0, zorder_others]
         self.data = [self.new_data[:], self.new_data[:], self.new_data[:]]
 
@@ -1719,7 +1735,7 @@ class TableForEllipse(MyTable):
         self.data_types = (wx.grid.GRID_VALUE_CHOICE + u':axes,data', wx.grid.GRID_VALUE_STRING,
                            wx.grid.GRID_VALUE_STRING, wx.grid.GRID_VALUE_STRING, wx.grid.GRID_VALUE_STRING,
                            wx.grid.GRID_VALUE_STRING, wx.grid.GRID_VALUE_STRING, wx.grid.GRID_VALUE_BOOL,
-                           wx.grid.GRID_VALUE_NUMBER + u':%d,%d' % (zorder_min, zorder_max))
+                           wx.grid.GRID_VALUE_NUMBER + u':{:d},{:d}'.format(zorder_min, zorder_max))
         self.new_data = ['axes', None, None, None, None, 0.0, 1.0, False, zorder_others]
         self.data = [self.new_data[:], self.new_data[:], self.new_data[:]]
 
@@ -1773,7 +1789,7 @@ class TableForPolygon(MyTable):
                          None, None, tooltip_zorder),)
         self.data_types = (wx.grid.GRID_VALUE_CHOICE + u':axes,data', wx.grid.GRID_VALUE_STRING,
                            wx.grid.GRID_VALUE_STRING, wx.grid.GRID_VALUE_BOOL,
-                           wx.grid.GRID_VALUE_NUMBER + u':%d,%d' % (zorder_min, zorder_max))
+                           wx.grid.GRID_VALUE_NUMBER + u':{:d},{:d}'.format(zorder_min, zorder_max))
         self.new_data = ['axes', None, 1.0, False, zorder_others]
         self.data = [self.new_data[:], self.new_data[:], self.new_data[:]]
 
@@ -1782,7 +1798,7 @@ class TableForPolygon(MyTable):
             return self.data[row][col]
         elif col == self.COL_XY:
             return (u''  if self.data[row][col] is None
-                else u', '.join([u'%g, %g' % (i[0], i[1]) for i in self.data[row][col]]))
+                else u', '.join([u'{:g}, {:g}'.format(i[0], i[1]) for i in self.data[row][col]]))
         elif col == self.COL_FILL:
             return u'1' if self.data[row][col] else u''
         else:
@@ -1839,7 +1855,7 @@ class TableForNaca4(MyTable):
         self.data_types = (wx.grid.GRID_VALUE_STRING, wx.grid.GRID_VALUE_CHOICE + u':axes,data',
                            wx.grid.GRID_VALUE_STRING, wx.grid.GRID_VALUE_STRING, wx.grid.GRID_VALUE_STRING,
                            wx.grid.GRID_VALUE_STRING, wx.grid.GRID_VALUE_STRING,
-                           wx.grid.GRID_VALUE_BOOL, wx.grid.GRID_VALUE_NUMBER + u':%d,%d' % (zorder_min, zorder_max))
+                           wx.grid.GRID_VALUE_BOOL, wx.grid.GRID_VALUE_NUMBER + u':{:d},{:d}'.format(zorder_min, zorder_max))
         self.new_data = [None, 'axes', None, None, None, None, 1.0, False, zorder_others]
         self.data = [self.new_data[:], self.new_data[:], self.new_data[:]]
 
@@ -1857,7 +1873,10 @@ class TableForNaca4(MyTable):
 
     def SetValue(self, row, col, value):
         if col == self.COL_4DIGITS:
-            self.data[row][col] = (u'%04d' % int(value))[:4]
+            try:
+                self.data[row][col] = (u'%04d' % int(value))[:4]
+            except:
+                self.data[row][col] = None
         elif col == self.COL_COORDINATE:
             self.data[row][col] = value
         elif col == self.COL_FILL:
@@ -2457,7 +2476,7 @@ class FrameMain(wx.Frame):
 
         for i in range(n_scatter):
             sbSizer1 = wx.StaticBoxSizer(
-                wx.StaticBox(self.scrolledWindow_graph, wx.ID_ANY, _(u'散布図') + (u'%d' % (i + 1))), wx.VERTICAL)
+                wx.StaticBox(self.scrolledWindow_graph, wx.ID_ANY, _(u'散布図') + (u'{:d}'.format(i + 1))), wx.VERTICAL)
 
             bSizer3 = wx.BoxSizer(wx.HORIZONTAL)
 
@@ -2478,7 +2497,7 @@ class FrameMain(wx.Frame):
 
             self.filePickers_scatter.append(wx.FilePickerCtrl(sbSizer1.GetStaticBox(), wx.ID_ANY, wx.EmptyString,
                 _(u'ファイルを開く'), u'*.*', wx.DefaultPosition, wx.DefaultSize,
-                wx.FLP_USE_TEXTCTRL | wx.FLP_OPEN | wx.FLP_FILE_MUST_EXIST | wx.FLP_SMALL, name = 'filePicker_scatter%d' % i))
+                wx.FLP_USE_TEXTCTRL | wx.FLP_OPEN | wx.FLP_FILE_MUST_EXIST | wx.FLP_SMALL, name = 'filePicker_scatter{:d}'.format(i)))
             self.filePickers_scatter[i].SetForegroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_WINDOWTEXT))
             self.filePickers_scatter[i].SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_WINDOW))
             self.filePickers_scatter[i].SetToolTip(tooltip_drag_and_drop)
@@ -2486,7 +2505,7 @@ class FrameMain(wx.Frame):
             bSizer3.Add(self.filePickers_scatter[i], 1, wx.ALIGN_CENTER_VERTICAL | wx.TOP | wx.BOTTOM, 5)
 
             self.buttons_scatter_open_file.append(wx.Button(sbSizer1.GetStaticBox(), wx.ID_ANY, _(u'開く'),
-                wx.DefaultPosition, wx.DefaultSize, 0, name = 'bfilePicker_scatter%d' % i))
+                wx.DefaultPosition, wx.DefaultSize, 0, name = 'bfilePicker_scatter{:d}'.format(i)))
             self.buttons_scatter_open_file[i].SetToolTip(tooltip_open_file)
             bSizer3.Add(self.buttons_scatter_open_file[i], 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
 
@@ -2680,11 +2699,13 @@ class FrameMain(wx.Frame):
 
             self.textCtrls_scatter_marker_size_ratio.append(wx.TextCtrl(sbSizer1.GetStaticBox(), wx.ID_ANY, wx.EmptyString,
                 wx.DefaultPosition, wx.DefaultSize, 0))
-            self.textCtrls_scatter_marker_size_ratio[i].SetToolTip(_(u'空白の場合，指定しません．\nz最小の記号の大きさは「大きさ」で指定します．'))
+            self.textCtrls_scatter_marker_size_ratio[i].SetToolTip(
+                _(u'空白の場合，指定しません．\nz最小の記号の大きさは「大きさ」で指定します．'))
             self.textCtrls_scatter_marker_size_ratio[i].SetMinSize(wx.Size(60, -1))
             bSizer3.Add(self.textCtrls_scatter_marker_size_ratio[i], 0, wx.ALIGN_CENTER_VERTICAL | wx.TOP | wx.BOTTOM, 5)
 
-            staticText1 = wx.StaticText(sbSizer1.GetStaticBox(), wx.ID_ANY, _(u'×z最小の記号の大きさ'), wx.DefaultPosition, wx.DefaultSize, 0)
+            staticText1 = wx.StaticText(sbSizer1.GetStaticBox(), wx.ID_ANY, _(u'×z最小の記号の大きさ'),
+                wx.DefaultPosition, wx.DefaultSize, 0)
             staticText1.Wrap(-1)
             bSizer3.Add(staticText1, 0, wx.ALIGN_CENTER_VERTICAL | wx.TOP | wx.BOTTOM | wx.RIGHT, 5)
 
@@ -2813,7 +2834,53 @@ class FrameMain(wx.Frame):
             wx.DefaultPosition, wx.DefaultSize, 0)
         self.textCtrl_vector_scale.SetToolTip(_(u'ベクトルの長さにかける倍率．大きいほど長く表示される．'))
         self.textCtrl_vector_scale.SetMinSize(wx.Size(60, -1))
-        bSizer3.Add(self.textCtrl_vector_scale, 0, wx.ALIGN_CENTER_VERTICAL | wx.TOP | wx.BOTTOM, 5)
+        bSizer3.Add(self.textCtrl_vector_scale, 0, wx.ALIGN_CENTER_VERTICAL | wx.TOP | wx.BOTTOM | wx.RIGHT, 5)
+
+        sbSizer1.Add(bSizer3, 0, wx.EXPAND, 5)
+
+        bSizer3 = wx.BoxSizer(wx.HORIZONTAL)
+
+        staticText1 = wx.StaticText(sbSizer1.GetStaticBox(), wx.ID_ANY, _(u'凡例の横座標：'),
+            wx.DefaultPosition, wx.DefaultSize, 0)
+        staticText1.Wrap(-1)
+        bSizer3.Add(staticText1, 0, wx.ALIGN_CENTER_VERTICAL | wx.TOP | wx.BOTTOM | wx.LEFT, 5)
+
+        self.textCtrl_vector_legend_x = wx.TextCtrl(sbSizer1.GetStaticBox(), wx.ID_ANY, u'0.8',
+            wx.DefaultPosition, wx.DefaultSize, 0)
+        self.textCtrl_vector_legend_x.SetToolTip(_(u'凡例矢印先端の横座標，0/1だとグラフ枠の左/右端'))
+        self.textCtrl_vector_legend_x.SetMinSize(wx.Size(60, -1))
+        bSizer3.Add(self.textCtrl_vector_legend_x, 0, wx.ALIGN_CENTER_VERTICAL | wx.TOP | wx.BOTTOM, 5)
+
+        staticText1 = wx.StaticText(sbSizer1.GetStaticBox(), wx.ID_ANY, _(u'縦座標：'),
+            wx.DefaultPosition, wx.DefaultSize, 0)
+        staticText1.Wrap(-1)
+        bSizer3.Add(staticText1, 0, wx.ALIGN_CENTER_VERTICAL | wx.TOP | wx.BOTTOM | wx.LEFT, 5)
+
+        self.textCtrl_vector_legend_y = wx.TextCtrl(sbSizer1.GetStaticBox(), wx.ID_ANY, u'1.03',
+            wx.DefaultPosition, wx.DefaultSize, 0)
+        self.textCtrl_vector_legend_y.SetToolTip(_(u'凡例矢印先端の縦座標，0/1だとグラフ枠の下/上端'))
+        self.textCtrl_vector_legend_y.SetMinSize(wx.Size(60, -1))
+        bSizer3.Add(self.textCtrl_vector_legend_y, 0, wx.ALIGN_CENTER_VERTICAL | wx.TOP | wx.BOTTOM, 5)
+
+        staticText1 = wx.StaticText(sbSizer1.GetStaticBox(), wx.ID_ANY, _(u'矢印長さ：'),
+            wx.DefaultPosition, wx.DefaultSize, 0)
+        staticText1.Wrap(-1)
+        bSizer3.Add(staticText1, 0, wx.ALIGN_CENTER_VERTICAL | wx.TOP | wx.BOTTOM | wx.LEFT, 5)
+
+        self.textCtrl_vector_legend_u = wx.TextCtrl(sbSizer1.GetStaticBox(), wx.ID_ANY, u'1.0',
+            wx.DefaultPosition, wx.DefaultSize, 0)
+        self.textCtrl_vector_legend_u.SetMinSize(wx.Size(60, -1))
+        bSizer3.Add(self.textCtrl_vector_legend_u, 0, wx.ALIGN_CENTER_VERTICAL | wx.TOP | wx.BOTTOM, 5)
+
+        staticText1 = wx.StaticText(sbSizer1.GetStaticBox(), wx.ID_ANY, _(u'ラベル：'),
+            wx.DefaultPosition, wx.DefaultSize, 0)
+        staticText1.Wrap(-1)
+        bSizer3.Add(staticText1, 0, wx.ALIGN_CENTER_VERTICAL | wx.TOP | wx.BOTTOM | wx.LEFT, 5)
+
+        self.textCtrl_vector_legend_label = wx.TextCtrl(sbSizer1.GetStaticBox(), wx.ID_ANY, wx.EmptyString,
+            wx.DefaultPosition, wx.Size(-1, -1), 0)
+        self.textCtrl_vector_legend_label.SetToolTip(tooltip_tex)
+        bSizer3.Add(self.textCtrl_vector_legend_label, 1, wx.ALIGN_CENTER_VERTICAL | wx.TOP | wx.BOTTOM | wx.RIGHT, 5)
 
         sbSizer1.Add(bSizer3, 0, wx.EXPAND, 5)
 
@@ -2949,13 +3016,16 @@ class FrameMain(wx.Frame):
         self.menuItem_close = wx.MenuItem(self.menu_file, wx.ID_ANY, _(u'閉じる') + u'\tCtrl+W', wx.EmptyString, wx.ITEM_NORMAL)
         self.menu_file.Append(self.menuItem_close)
         self.menu_file.AppendSeparator()
-        self.menuItem_save_as = wx.MenuItem(self.menu_file, wx.ID_ANY, _(u'別名で保存') + u'\tShift+Ctrl+S', wx.EmptyString, wx.ITEM_NORMAL)
+        self.menuItem_save_as = wx.MenuItem(self.menu_file, wx.ID_ANY, _(u'別名で保存') + u'\tShift+Ctrl+S',
+            wx.EmptyString, wx.ITEM_NORMAL)
         self.menu_file.Append(self.menuItem_save_as)
         self.menu_file.AppendSeparator()
-        self.menuItem_save_as_script = wx.MenuItem(self.menu_file, wx.ID_ANY, _(u'pythonスクリプト形式で保存') + u'\tCtrl+K', wx.EmptyString, wx.ITEM_NORMAL)
+        self.menuItem_save_as_script = wx.MenuItem(self.menu_file, wx.ID_ANY, _(u'pythonスクリプト形式で保存') + u'\tCtrl+K',
+            wx.EmptyString, wx.ITEM_NORMAL)
         self.menu_file.Append(self.menuItem_save_as_script)
         self.menu_file.AppendSeparator()
-        self.menuItem_make_template = wx.MenuItem(self.menu_file, wx.ID_ANY, _(u'テンプレートを作る') + u'\tCtrl+T', wx.EmptyString, wx.ITEM_NORMAL)
+        self.menuItem_make_template = wx.MenuItem(self.menu_file, wx.ID_ANY, _(u'テンプレートを作る') + u'\tCtrl+T',
+            wx.EmptyString, wx.ITEM_NORMAL)
         self.menu_file.Append(self.menuItem_make_template)
         self.menubar.Append(self.menu_file, _(u'設定ファイル') + u'(&F)')
 
@@ -2972,9 +3042,11 @@ class FrameMain(wx.Frame):
         self.menubar.Append(self.menu_edit, _(u'編集') + u'(&E)')
 
         self.menu_plot = wx.Menu()
-        self.menuItem_plot = wx.MenuItem(self.menu_plot, wx.ID_ANY, _(u'グラフをプロット') + u'\tCtrl+P', wx.EmptyString, wx.ITEM_NORMAL)
+        self.menuItem_plot = wx.MenuItem(self.menu_plot, wx.ID_ANY, _(u'グラフをプロット') + u'\tCtrl+P',
+            wx.EmptyString, wx.ITEM_NORMAL)
         self.menu_plot.Append(self.menuItem_plot)
-        self.menuItem_plot_direct = wx.MenuItem(self.menu_plot, wx.ID_ANY, _(u'設定ファイルから直接プロット') + u'\tShift+Ctrl+P', wx.EmptyString, wx.ITEM_NORMAL)
+        self.menuItem_plot_direct = wx.MenuItem(self.menu_plot, wx.ID_ANY, _(u'設定ファイルから直接プロット') + u'\tShift+Ctrl+P',
+            wx.EmptyString, wx.ITEM_NORMAL)
         self.menu_plot.Append(self.menuItem_plot_direct)
         self.menubar.Append(self.menu_plot, _(u'プロット') + u'(&P)')
 
@@ -3146,7 +3218,7 @@ class FrameMain(wx.Frame):
             print(sys.exc_info())
         for i, j in ((self.textCtrl_fig_size_w, 0), (self.textCtrl_fig_size_h, 1)):
             try:
-                i.SetValue(u'%g' % s[0]['fig_size'][j] if 'fig_size' in s[0] and
+                i.SetValue(u'{:g}'.format(s[0]['fig_size'][j]) if 'fig_size' in s[0] and
                     s[0]['fig_size'] is not None and s[0]['fig_size'][j] is not None else u'')
             except:
                 print(sys.exc_info())
@@ -3195,14 +3267,14 @@ class FrameMain(wx.Frame):
         try:
             self.comboBox_aspect.SetValue((u'auto' if s[0]['aspect'] is None
                 else (s[0]['aspect'] if s[0]['aspect'] in (u'auto', u'equal')
-                else u'%g' % s[0]['aspect'])) if 'aspect' in s[0] else u'auto')
+                else u'{:g}'.format(s[0]['aspect']))) if 'aspect' in s[0] else u'auto')
         except:
             print(sys.exc_info())
         try:
             if 'legend_location' in s[0] and s[0]['legend_location'] is not None:
-                self.textCtrl_legend_left.SetValue(u'%g' % s[0]['legend_location'][0]
+                self.textCtrl_legend_left.SetValue(u'{:g}'.format(s[0]['legend_location'][0])
                     if s[0]['legend_location'][0] is not None else u'')
-                self.textCtrl_legend_top.SetValue(u'%g' % s[0]['legend_location'][1]
+                self.textCtrl_legend_top.SetValue(u'{:g}'.format(s[0]['legend_location'][1])
                     if s[0]['legend_location'][1] is not None else u'')
             else:
                 self.textCtrl_legend_left.SetValue(u'')
@@ -3216,10 +3288,10 @@ class FrameMain(wx.Frame):
                     l, r = r, l
                 if b is not None and t is not None and b > t:
                     b, t = t, b
-                self.textCtrl_graph_left.SetValue(u'%g' % l if l is not None else u'')
-                self.textCtrl_graph_bottom.SetValue(u'%g' % b if b is not None else u'')
-                self.textCtrl_graph_right.SetValue(u'%g' % r if r is not None else u'')
-                self.textCtrl_graph_top.SetValue(u'%g' % t if t is not None else u'')
+                self.textCtrl_graph_left.SetValue(u'{:g}'.format(l) if l is not None else u'')
+                self.textCtrl_graph_bottom.SetValue(u'{:g}'.format(b) if b is not None else u'')
+                self.textCtrl_graph_right.SetValue(u'{:g}'.format(r) if r is not None else u'')
+                self.textCtrl_graph_top.SetValue(u'{:g}'.format(t) if t is not None else u'')
             else:
                 self.textCtrl_graph_left.SetValue(u'')
                 self.textCtrl_graph_bottom.SetValue(u'')
@@ -3283,7 +3355,7 @@ class FrameMain(wx.Frame):
                             i.SetValue(u"'" + (x['columns'][j].decode('UTF-8')
                             if sys.version_info.major <= 2 else x['columns'][j]) + u"'")
                         else:
-                            i.SetValue(u'%d' % x['columns'][j])
+                            i.SetValue(u'{:d}'.format(x['columns'][j]))
                     except:
                         i.SetValue(u'')
                 self.textCtrls_scatter_err_column_xn[n].SetValue(u'')
@@ -3304,7 +3376,7 @@ class FrameMain(wx.Frame):
                                             u"'" + (j[0].decode('UTF-8') if sys.version_info.major <= 2 else j[0]) + u"'")
                                     else:
                                         (self.textCtrls_scatter_err_column_xn[n] if i == 0
-                                            else self.textCtrls_scatter_err_column_yn[n]).SetValue(u'%d' % j[0])
+                                            else self.textCtrls_scatter_err_column_yn[n]).SetValue(u'{:d}'.format(j[0]))
                                 else:
                                     if type(j[0]) is str:
                                         (self.textCtrls_scatter_err_column_xn[n] if i == 0
@@ -3312,14 +3384,14 @@ class FrameMain(wx.Frame):
                                             u"'" + (j[0].decode('UTF-8') if sys.version_info.major <= 2 else j[0]) + u"'")
                                     else:
                                         (self.textCtrls_scatter_err_column_xn[n] if i == 0
-                                            else self.textCtrls_scatter_err_column_yn[n]).SetValue(u'%d' % j[0])
+                                            else self.textCtrls_scatter_err_column_yn[n]).SetValue(u'{:d}'.format(j[0]))
                                     if type(j[1]) is str:
                                         (self.textCtrls_scatter_err_column_xp[n] if i == 0
                                             else self.textCtrls_scatter_err_column_yp[n]).SetValue(
                                             u"'" + (j[1].decode('UTF-8') if sys.version_info.major <= 2 else j[1]) + u"'")
                                     else:
                                         (self.textCtrls_scatter_err_column_xp[n] if i == 0
-                                            else self.textCtrls_scatter_err_column_yp[n]).SetValue(u'%d' % j[1])
+                                            else self.textCtrls_scatter_err_column_yp[n]).SetValue(u'{:d}'.format(j[1]))
                             elif j is not None:
                                 if type(j) is str:
                                     (self.textCtrls_scatter_err_column_xn[n] if i == 0
@@ -3327,11 +3399,11 @@ class FrameMain(wx.Frame):
                                         u"'" + (j.decode('UTF-8') if sys.version_info.major <= 2 else j) + u"'")
                                 else:
                                     (self.textCtrls_scatter_err_column_xn[n] if i == 0
-                                        else self.textCtrls_scatter_err_column_yn[n]).SetValue(u'%d' % j)
+                                        else self.textCtrls_scatter_err_column_yn[n]).SetValue(u'{:d}'.format(j))
                         except:
                             print(sys.exc_info())
                 try:
-                    self.textCtrls_scatter_every[n].SetValue(u'%d' % x['every'])
+                    self.textCtrls_scatter_every[n].SetValue(u'{:d}'.format(x['every']))
                 except:
                     self.textCtrls_scatter_every[n].SetValue(u'1')
                 try:
@@ -3344,7 +3416,7 @@ class FrameMain(wx.Frame):
                 except:
                     print(sys.exc_info())
                 try:
-                    self.textCtrls_scatter_marker_size[n].SetValue(u'%g' % x['marker_size']
+                    self.textCtrls_scatter_marker_size[n].SetValue(u'{:g}'.format(x['marker_size'])
                         if 'marker_size' in x and x['marker_size'] is not None else u'')
                 except:
                     print(sys.exc_info())
@@ -3378,7 +3450,7 @@ class FrameMain(wx.Frame):
                 except:
                     print(sys.exc_info())
                 try:
-                    self.textCtrls_scatter_marker_size_ratio[n].SetValue(u'%g' % x['marker_size_ratio']
+                    self.textCtrls_scatter_marker_size_ratio[n].SetValue(u'{:g}'.format(x['marker_size_ratio'])
                         if 'marker_size_ratio' in x and x['marker_size_ratio'] is not None else u'')
                 except:
                     print(sys.exc_info())
@@ -3400,11 +3472,11 @@ class FrameMain(wx.Frame):
                             i.SetValue(u"'" + (x['columns'][j].decode('UTF-8')
                             if sys.version_info.major <= 2 else x['columns'][j]) + u"'")
                         else:
-                            i.SetValue(u'%d' % x['columns'][j])
+                            i.SetValue(u'{:d}'.format(x['columns'][j]))
                     except:
                         i.SetValue(u'')
                 try:
-                    self.textCtrl_vector_every.SetValue(u'%d' % x['every'])
+                    self.textCtrl_vector_every.SetValue(u'{:d}'.format(x['every']))
                 except:
                     self.textCtrl_vector_every.SetValue(u'1')
                 try:
@@ -3425,8 +3497,19 @@ class FrameMain(wx.Frame):
                 except:
                     print(sys.exc_info())
                 try:
-                    self.textCtrl_vector_scale.SetValue(u'%g' % x['scale']
+                    self.textCtrl_vector_scale.SetValue(u'{:g}'.format(x['scale'])
                         if 'scale' in x and x['scale'] is not None else u'')
+                except:
+                    print(sys.exc_info())
+                for i, j in ((self.textCtrl_vector_legend_x, 0), (self.textCtrl_vector_legend_y, 1),
+                             (self.textCtrl_vector_legend_u, 2)):
+                    try:
+                        i.SetValue(u'{:g}'.format(x['legend'][j]) if 'legend' in x and x['legend'] is not None else u'')
+                    except:
+                        print(sys.exc_info())
+                try:
+                    self.textCtrl_vector_legend_label.SetValue(x['legend'][3]
+                        if 'legend' in x and x['legend'] is not None else u'')
                 except:
                     print(sys.exc_info())
             elif x['type'] == u'contour' and 'file_name' in x and x['file_name'] is not None:
@@ -3447,11 +3530,11 @@ class FrameMain(wx.Frame):
                             i.SetValue(u"'" + (x['columns'][j].decode('UTF-8')
                             if sys.version_info.major <= 2 else x['columns'][j]) + u"'")
                         else:
-                            i.SetValue(u'%d' % x['columns'][j])
+                            i.SetValue(u'{:d}'.format(x['columns'][j]))
                     except:
                         self.i.SetValue(u'')
                 try:
-                    self.textCtrl_contour_every.SetValue(u'%d' % x['every'])
+                    self.textCtrl_contour_every.SetValue(u'{:d}'.format(x['every']))
                 except:
                     self.textCtrl_contour_every.SetValue(u'1')
                 try:
@@ -3783,6 +3866,15 @@ class FrameMain(wx.Frame):
                     s += u"    'scale': {:g},\n".format(float(self.textCtrl_vector_scale.GetValue()))
                 except:
                     s += u"    'scale': 1.0,\n"
+                try:
+                    v = self.textCtrl_vector_legend_label.GetValue()
+                    v = 'None' if v == u'' else "'{}'".format(v.replace("\\", r"\\").replace("'", r"\'"))
+                    s += u"    'legend': ({:g}, {:g}, {:g}, {}),\n".format(
+                        float(self.textCtrl_vector_legend_x.GetValue()),
+                        float(self.textCtrl_vector_legend_y.GetValue()),
+                        float(self.textCtrl_vector_legend_u.GetValue()), v)
+                except:
+                    s += u"    'legend': None,\n"
                 s += u"},\n"
             if self.filePicker_contour.GetPath() != u'':
                 s += u"{\n    'type': 'contour',\n"
