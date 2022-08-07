@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 # matplotlibwx.py
 # by Yukiharu Iwamoto
-# 2022/8/6 6:25:58 PM
+# 2022/8/7 5:52:52 PM
 
 # Macの場合，文字入力後に引用符が勝手に変わったりしてうまく動かない．
 # 「システム環境設定」→「キーボード」→「ユーザー辞書」→「スマート引用符とスマートダッシュを使用」のチェックを外す．
 
-version = '2022/8/6 6:25:58 PM'
+version = '2022/8/7 5:52:52 PM'
 
 import os
 languages = os.environ.get('LANG')
@@ -836,13 +836,13 @@ def plot_vector(data, ranges = (None, None, None), ticks = (None, None, None), l
     else:
         quiv = plt.quiver(data[0], data[1], data[2], data[3], angles = 'xy', scale_units = 'xy',
             scale = 1.0/scale, color = color, zorder = zorder)
-    if legend is not None:
-        plt.quiverkey(quiv, X = legend[0], Y = legend[1], U = 184.0*legend[2],
-            label = '{}{}'.format('' if legend[2] == 1 else legend[2], legend[3] if legend[3] is not None else ''),
+    if legend is not None and sys.version_info.major > 2:
+        # In the latest version of matplotlib (2.2.5) for Python 2, Quiverkey has a bug.
+        # "The scale_units='xy' case is not being handled correctly by Quiverkey,"
+        # stated in https://github.com/matplotlib/matplotlib/issues/13616
+        plt.quiverkey(quiv, X = legend[0], Y = legend[1], U = legend[2],
+            label = ('' if legend[2] == 1.0 else '{:g}'.format(legend[2])) + (legend[3] if legend[3] is not None else ''),
             coordinates = 'axes', labelpos = 'E')
-#    plt.quiverkey(quiv, 0.5, 1.01, U = 184.0, label = r'$\mathsf{u/U_m = 1}$', coordinates = 'axes', labelpos = 'E')
-#    "The scale_units='xy' case is not being handled correctly by Quiverkey,"
-#    stated in https://github.com/matplotlib/matplotlib/issues/13616
 
 def plot_contour(data, ranges = (None, None, None), ticks = (None, None, None), log_scale = (False, False, False),
     fig_size = None, aspect = 'auto', graph_edges = None, title = None, labels = None, grids = (False, False),
@@ -2840,7 +2840,8 @@ class FrameMain(wx.Frame):
 
         bSizer3 = wx.BoxSizer(wx.HORIZONTAL)
 
-        staticText1 = wx.StaticText(sbSizer1.GetStaticBox(), wx.ID_ANY, _(u'凡例の横座標：'),
+        staticText1 = wx.StaticText(sbSizer1.GetStaticBox(), wx.ID_ANY,
+            (_(u'!!Python 3でのみ有効!!→') if sys.version_info.major <= 2 else u'') + _(u'凡例の横座標：'),
             wx.DefaultPosition, wx.DefaultSize, 0)
         staticText1.Wrap(-1)
         bSizer3.Add(staticText1, 0, wx.ALIGN_CENTER_VERTICAL | wx.TOP | wx.BOTTOM | wx.LEFT, 5)

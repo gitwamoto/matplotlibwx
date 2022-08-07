@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-06 18:19+0900\n"
+"POT-Creation-Date: 2022-08-07 17:50+0900\n"
 "PO-Revision-Date: 2019-09-02 21:52+0900\n"
 "Last-Translator: Yukiharu Iwamoto <iwamoto@iwamoto-4.local>\n"
 "Language-Team: English\n"
@@ -381,7 +381,7 @@ msgid "ドラッグ&ドロップで決めることもできます．"
 msgstr "Drag and drop is also available."
 
 #: matplotlibwx.py:2058 matplotlibwx.py:2499 matplotlibwx.py:2736
-#: matplotlibwx.py:2909
+#: matplotlibwx.py:2910
 msgid "ファイルを開く"
 msgstr "Open a file"
 
@@ -389,12 +389,12 @@ msgstr "Open a file"
 msgid "設定ファイル："
 msgstr "Setting file:"
 
-#: matplotlibwx.py:2077 matplotlibwx.py:2087 matplotlibwx.py:3552
+#: matplotlibwx.py:2077 matplotlibwx.py:2087 matplotlibwx.py:3553
 msgid "設定ファイルを開く"
 msgstr "Open a setting file"
 
 #: matplotlibwx.py:2085 matplotlibwx.py:2507 matplotlibwx.py:2744
-#: matplotlibwx.py:2917 matplotlibwx.py:3012
+#: matplotlibwx.py:2918 matplotlibwx.py:3013
 msgid "開く"
 msgstr "Open"
 
@@ -518,15 +518,15 @@ msgstr "Parameters used when specifying file reading columns with formulas"
 msgid "散布図"
 msgstr "Scatter plot"
 
-#: matplotlibwx.py:2493 matplotlibwx.py:2730 matplotlibwx.py:2903
+#: matplotlibwx.py:2493 matplotlibwx.py:2730 matplotlibwx.py:2904
 msgid "ファイル："
 msgstr "File:"
 
-#: matplotlibwx.py:2516 matplotlibwx.py:2753 matplotlibwx.py:2932
+#: matplotlibwx.py:2516 matplotlibwx.py:2753 matplotlibwx.py:2933
 msgid "xの列："
 msgstr "Col. for x:"
 
-#: matplotlibwx.py:2526 matplotlibwx.py:2763 matplotlibwx.py:2942
+#: matplotlibwx.py:2526 matplotlibwx.py:2763 matplotlibwx.py:2943
 msgid "yの列："
 msgstr "Col. for y:"
 
@@ -542,11 +542,11 @@ msgstr ","
 msgid "yの-, +側誤差棒の列："
 msgstr "Cols. for -, + ends of y-error bar"
 
-#: matplotlibwx.py:2580 matplotlibwx.py:2793 matplotlibwx.py:2962
+#: matplotlibwx.py:2580 matplotlibwx.py:2793 matplotlibwx.py:2963
 msgid "読み込み："
 msgstr "Read every:"
 
-#: matplotlibwx.py:2589 matplotlibwx.py:2802 matplotlibwx.py:2971
+#: matplotlibwx.py:2589 matplotlibwx.py:2802 matplotlibwx.py:2972
 msgid "行ごと"
 msgstr " rows"
 
@@ -582,7 +582,7 @@ msgstr "Line type:"
 msgid "線色："
 msgstr "Line color:"
 
-#: matplotlibwx.py:2675 matplotlibwx.py:2952
+#: matplotlibwx.py:2675 matplotlibwx.py:2953
 msgid "zの列："
 msgstr "Col. for z:"
 
@@ -659,153 +659,159 @@ msgstr "Magnification:"
 msgid "ベクトルの長さにかける倍率．大きいほど長く表示される．"
 msgstr "Magnification for vector length. The larger, the longer displayed."
 
-#: matplotlibwx.py:2843
+#: matplotlibwx.py:2844
+msgid "!!Python 3でのみ有効!!→"
+msgstr "!!Available only on Python 3!!->"
+
+#: matplotlibwx.py:2844
 msgid "凡例の横座標："
 msgstr "Legend horiz. loc.:"
 
-#: matplotlibwx.py:2850
+#: matplotlibwx.py:2851
 msgid "凡例矢印先端の横座標，0/1だとグラフ枠の左/右端"
-msgstr "Horizontal coordinates of the tip of the legend arrow, 0/1 correspond to left/right edges of the graph frame."
+msgstr ""
+"Horizontal coordinates of the tip of the legend arrow, 0/1 correspond to "
+"left/right edges of the graph frame."
 
-#: matplotlibwx.py:2854
+#: matplotlibwx.py:2855
 msgid "縦座標："
 msgstr "Vert. loc.："
 
-#: matplotlibwx.py:2861
+#: matplotlibwx.py:2862
 msgid "凡例矢印先端の縦座標，0/1だとグラフ枠の下/上端"
-msgstr "Vertical coordinates of the tip of the legend arrow, 0/1 correspond to bottom/top edges of the graph frame."
+msgstr ""
+"Vertical coordinates of the tip of the legend arrow, 0/1 correspond to "
+"bottom/top edges of the graph frame."
 
-#: matplotlibwx.py:2865
+#: matplotlibwx.py:2866
 msgid "矢印長さ："
 msgstr "Arrow length:"
 
-#: matplotlibwx.py:2875
+#: matplotlibwx.py:2876
 msgid "ラベル："
 msgstr "Label:"
 
-#: matplotlibwx.py:2889
+#: matplotlibwx.py:2890
 msgid "等高線"
 msgstr "Contour plot"
 
-#: matplotlibwx.py:2926
+#: matplotlibwx.py:2927
 msgid "碁盤の目状"
 msgstr "Grid pattern"
 
-#: matplotlibwx.py:2928
+#: matplotlibwx.py:2929
 msgid ""
 "データが碁盤の目状に並んでいる時にチェックを付けると，描画が高速になります．"
 msgstr "Draws rapidly if checked when data is structured with grid pattern."
 
-#: matplotlibwx.py:2979
+#: matplotlibwx.py:2980
 msgid "塗り："
 msgstr "Paint:"
 
-#: matplotlibwx.py:2988
+#: matplotlibwx.py:2989
 msgid "滑らかな面塗り"
 msgstr "Smooth paint"
 
-#: matplotlibwx.py:3014 matplotlibwx.py:3125
+#: matplotlibwx.py:3015 matplotlibwx.py:3126
 msgid "保存"
 msgstr "Save"
 
-#: matplotlibwx.py:3016
+#: matplotlibwx.py:3017
 msgid "閉じる"
 msgstr "Close"
 
-#: matplotlibwx.py:3019
+#: matplotlibwx.py:3020
 msgid "別名で保存"
 msgstr "Save as an another"
 
-#: matplotlibwx.py:3023 matplotlibwx.py:3939
+#: matplotlibwx.py:3024 matplotlibwx.py:3940
 msgid "pythonスクリプト形式で保存"
 msgstr "Save as a python script"
 
-#: matplotlibwx.py:3027 matplotlibwx.py:3950
+#: matplotlibwx.py:3028 matplotlibwx.py:3951
 msgid "テンプレートを作る"
 msgstr "Make a template"
 
-#: matplotlibwx.py:3030
+#: matplotlibwx.py:3031
 msgid "設定ファイル"
 msgstr "Setting file"
 
-#: matplotlibwx.py:3033
-#, fuzzy
+#: matplotlibwx.py:3034
 msgid "カット"
-msgstr "Reset"
+msgstr "Cut"
 
-#: matplotlibwx.py:3036
-#, fuzzy
+#: matplotlibwx.py:3037
 msgid "コピー"
-msgstr "Graph"
+msgstr "Copy"
 
-#: matplotlibwx.py:3039
+#: matplotlibwx.py:3040
 msgid "ペースト"
-msgstr "ペースト"
+msgstr "Paste"
 
-#: matplotlibwx.py:3042
+#: matplotlibwx.py:3043
 msgid "編集"
-msgstr "編集"
+msgstr "Edit"
 
-#: matplotlibwx.py:3045
+#: matplotlibwx.py:3046
 msgid "グラフをプロット"
 msgstr "Plot a graph"
 
-#: matplotlibwx.py:3048 matplotlibwx.py:3984
+#: matplotlibwx.py:3049 matplotlibwx.py:3985
 msgid "設定ファイルから直接プロット"
 msgstr "Plot directly from setting file"
 
-#: matplotlibwx.py:3051
+#: matplotlibwx.py:3052
 msgid "プロット"
 msgstr "Plot"
 
-#: matplotlibwx.py:3054
+#: matplotlibwx.py:3055
 msgid "アップデート"
 msgstr "Update"
 
-#: matplotlibwx.py:3056
+#: matplotlibwx.py:3057
 msgid "使い方の動画"
 msgstr "Video on how to use"
 
-#: matplotlibwx.py:3058
+#: matplotlibwx.py:3059
 msgid "ヘルプ"
 msgstr "Help"
 
-#: matplotlibwx.py:3123
+#: matplotlibwx.py:3124
 msgid "設定を保存しますか？"
 msgstr "Save settings?"
 
-#: matplotlibwx.py:3124
+#: matplotlibwx.py:3125
 msgid "設定を "
 msgstr "Save settings to "
 
-#: matplotlibwx.py:3124
+#: matplotlibwx.py:3125
 msgid " に保存しますか？"
 msgstr " ?"
 
-#: matplotlibwx.py:3930
+#: matplotlibwx.py:3931
 msgid "設定ファイルを保存"
 msgstr "Save in setting file"
 
-#: matplotlibwx.py:4000
+#: matplotlibwx.py:4001
 msgid "Googleドライブに接続できませんでした．後でやり直して下さい．"
 msgstr "Could not connect to Google Drive. Please try again later."
 
-#: matplotlibwx.py:4001
+#: matplotlibwx.py:4002
 msgid "接続エラー"
 msgstr "Connection error"
 
-#: matplotlibwx.py:4023
+#: matplotlibwx.py:4024
 msgid "プログラムを実行し直すとアップデートが有効になります．"
 msgstr "The updated program will be available after restarting the program."
 
-#: matplotlibwx.py:4024
+#: matplotlibwx.py:4025
 msgid "アップデート完了"
 msgstr "Update completed."
 
-#: matplotlibwx.py:4027
+#: matplotlibwx.py:4028
 msgid "アップデートの必要はありません．"
 msgstr "No updates."
 
-#: matplotlibwx.py:4028
+#: matplotlibwx.py:4029
 msgid "プログラムは最新です．"
 msgstr "The program is up to date."
