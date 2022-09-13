@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 # matplotlibwx.py
 # by Yukiharu Iwamoto
-# 2022/8/7 5:52:52 PM
+# 2022/9/13 4:11:49 PM
 
 # Macの場合，文字入力後に引用符が勝手に変わったりしてうまく動かない．
 # 「システム環境設定」→「キーボード」→「ユーザー辞書」→「スマート引用符とスマートダッシュを使用」のチェックを外す．
 
-version = '2022/8/7 5:52:52 PM'
+version = '2022/9/13 4:11:49 PM'
 
 import os
 languages = os.environ.get('LANG')
@@ -362,7 +362,7 @@ def data_from_file(file_name, columns = (1, 2), every = 1, skip = '#', delimiter
             wb.release_resources()
             del wb
         else: # .xlsx
-            wb = openpyxl.load_workbook(file_name)
+            wb = openpyxl.load_workbook(file_name, data_only = True)
             lines = [[[v.value for v in row] for row in ws.rows] for ws in wb.worksheets]
             wb.close()
         n_lines = None
