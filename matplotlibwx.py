@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 # matplotlibwx.py
 # by Yukiharu Iwamoto
-# 2022/11/25 5:22:59 PM
+# 2023/4/26 3:03:08 PM
 
 # Macの場合，文字入力後に引用符が勝手に変わったりしてうまく動かない．
 # 「システム環境設定」→「キーボード」→「ユーザー辞書」→「スマート引用符とスマートダッシュを使用」のチェックを外す．
 
-version = '2022/11/25 5:22:38 PM'
+version = '2023/4/26 3:03:08 PM'
 
 import os
 languages = os.environ.get('LANG')
@@ -141,11 +141,17 @@ def get_file_from_google_drive(file_id):
                 m = re.search('id="downloadForm" action=".+?&amp;confirm=(.+?)"', r.text)
                 if m:
                     code = m.group(1)
+                else:
+                    m = re.search('&amp;confirm=t&amp;uuid=(.+?)"', r.text)
+                    if m:
+                        code = m.group(1)
             r = requests.get('https://drive.google.com/uc',
                 params = (('export', 'download'), ('confirm', code), ('id', file_id)), cookies = cookies)
             r.encoding = r.apparent_encoding
+            print(r.text)
         return r.text # unicode
     except:
+#        print(sys.exc_info())
         raise
 
 def naca_4digits_airfoil(digits, points = 51):
