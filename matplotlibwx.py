@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 # matplotlibwx.py
 # by Yukiharu Iwamoto
-# 2023/4/26 3:03:08 PM
+# 2023/4/27 4:16:34 PM
 
 # Macの場合，文字入力後に引用符が勝手に変わったりしてうまく動かない．
 # 「システム環境設定」→「キーボード」→「ユーザー辞書」→「スマート引用符とスマートダッシュを使用」のチェックを外す．
 
-version = '2023/4/26 3:03:08 PM'
+version = '2023/4/27 4:16:34 PM'
 
 import os
 languages = os.environ.get('LANG')
@@ -4035,7 +4035,7 @@ class FrameMain(wx.Frame):
                 md.ShowModal()
 
     def menuItem_movieOnMenuSelection(self, event):
-        webbrowser.open(url = 'https://youtu.be/SYtXwm9khCk')
+        webbrowser.open(url = 'https://youtu.be/WKnJaJfyNww')
 
 if __name__ == '__main__':
     if len(sys.argv) == 1:
