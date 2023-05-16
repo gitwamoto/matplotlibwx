@@ -153,6 +153,10 @@ def get_file_from_google_drive(file_id):
 #        print(sys.exc_info())
         raise
 
+def get_file_from_github_public(user, repository, branch, file_name):
+    r = requests.get('https://raw.githubusercontent.com/' + user + '/' + repository + '/' + branch + '/' + file_name)
+    return r.content
+
 def naca_4digits_airfoil(digits, points = 51):
     # Example:
     # NACA 2 4 1 2'
