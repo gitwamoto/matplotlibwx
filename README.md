@@ -10,6 +10,8 @@ PythonのmatplotlibとwxPythonを利用して，散布図，ベクトル線図�
 英語環境で使えば，英語表記になるはずです．
 強制的に英語表記にしたい場合，matplotlibwx.pyをテキストエディタで開き，先頭付近に書いてある#languages = ['en']のコメントを外して保存してから実行して下さい．
 
+---
+
 This is a Python script for drawing scatter plots, vector plots, and color contours using Python's matplotlib and wxPython with GUI operations.
 
 Download the folder and run matplotlibwx.py in Python.
