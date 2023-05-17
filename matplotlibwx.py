@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 # matplotlibwx.py
 # by Yukiharu Iwamoto
-# 2023/5/17 1:31:42 PM
+# 2023/5/17 8:00:46 PM
 
 # Macの場合，文字入力後に引用符が勝手に変わったりしてうまく動かない．
 # 「システム環境設定」→「キーボード」→「ユーザー辞書」→「スマート引用符とスマートダッシュを使用」のチェックを外す．
 
-version = '2023/5/17 1:31:42 PM'
+version = '2023/5/17 8:00:46 PM'
 
 import os
 languages = os.environ.get('LANG')
@@ -4030,7 +4030,13 @@ class FrameMain(wx.Frame):
                 with open(os.path.join(d, u'messages.mo'), 'wb') as f:
 #                    f.write(get_file_from_google_drive('1xVuaz179QpwFxb2Xf0zJFkn1x0HT_plC', binary = True))
                     f.write(get_file_from_github_public(user = 'gitwamoto', repository = 'matplotlibwx',
-                branch = 'main', file_path = 'locale/en/LC_MESSAGES/messages.mo'))
+                        branch = 'main', file_path = 'locale/en/LC_MESSAGES/messages.mo'))
+                with codecs.open(os.path.join(d, u'messages.po'), 'w', encoding = 'UTF-8') as f:
+                    f.write(get_file_from_github_public(user = 'gitwamoto', repository = 'matplotlibwx',
+                        branch = 'main', file_path = 'locale/en/LC_MESSAGES/messages.po'))
+                with codecs.open(os.path.join(os.path.dirname(p), u'locale', u'messages.pot'), 'w', encoding = 'UTF-8') as f:
+                    f.write(get_file_from_github_public(user = 'gitwamoto', repository = 'matplotlibwx',
+                        branch = 'main', file_path = 'locale/messages.pot'))
             except:
 #                print(sys.exc_info())
                 pass
