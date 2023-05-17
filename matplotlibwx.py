@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 # matplotlibwx.py
 # by Yukiharu Iwamoto
-# 2023/5/17 12:37:41 PM
+# 2023/5/17 1:31:42 PM
 
 # Macの場合，文字入力後に引用符が勝手に変わったりしてうまく動かない．
 # 「システム環境設定」→「キーボード」→「ユーザー辞書」→「スマート引用符とスマートダッシュを使用」のチェックを外す．
 
-version = '2023/5/17 12:37:41 PM'
+version = '2023/5/17 1:31:42 PM'
 
 import os
 languages = os.environ.get('LANG')
@@ -155,14 +155,14 @@ def get_file_from_google_drive(file_id, binary = False):
             r = requests.get('https://drive.google.com/uc',
                 params = (('export', 'download'), ('confirm', code), ('id', file_id)), cookies = cookies)
             r.encoding = r.apparent_encoding
-        return r.text # Pthon 2 -> unicode, Python 3 -> bytes
+        return r.text # Pthon 2 -> unicode, Python 3 -> str
     except:
 #        print(sys.exc_info())
         raise
 
-def get_file_from_github_public(user, repository, branch, file_name):
-    r = requests.get('https://raw.githubusercontent.com/' + user + '/' + repository + '/' + branch + '/' + file_name)
-    return r.content
+def get_file_from_github_public(user, repository, branch, file_path):
+    r = requests.get('https://raw.githubusercontent.com/' + user + '/' + repository + '/' + branch + '/' + file_path)
+    return r.content # Pthon 2 -> str, Python 3 -> bytes
 
 def naca_4digits_airfoil(digits, points = 51):
     # Example:
@@ -4009,9 +4009,9 @@ class FrameMain(wx.Frame):
 
     def menuItem_updateOnMenuSelection(self, event):
         try:
-            s = get_file_from_google_drive('18jsRVeShgjhvKi_X6m9z-JQKlHkedDnT')
-            if sys.platform == 'darwin' and sys.version_info.major <= 2:
-                s = s.decode('UTF-8')
+#           s = get_file_from_google_drive('18jsRVeShgjhvKi_X6m9z-JQKlHkedDnT')
+            s = get_file_from_github_public(user = 'gitwamoto', repository = 'matplotlibwx',
+                branch = 'main', file_path = 'matplotlibwx.py').decode('UTF-8')
         except:
             with wx.MessageDialog(self,
                 _(u'Googleドライブに接続できませんでした．後でやり直して下さい．'),
@@ -4028,7 +4028,9 @@ class FrameMain(wx.Frame):
                 if not os.path.isdir(d):
                     os.makedirs(d)
                 with open(os.path.join(d, u'messages.mo'), 'wb') as f:
-                    f.write(get_file_from_google_drive('1xVuaz179QpwFxb2Xf0zJFkn1x0HT_plC', binary = True))
+#                    f.write(get_file_from_google_drive('1xVuaz179QpwFxb2Xf0zJFkn1x0HT_plC', binary = True))
+                    f.write(get_file_from_github_public(user = 'gitwamoto', repository = 'matplotlibwx',
+                branch = 'main', file_path = 'locale/en/LC_MESSAGES/messages.mo'))
             except:
 #                print(sys.exc_info())
                 pass
