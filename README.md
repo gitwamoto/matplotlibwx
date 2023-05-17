@@ -11,6 +11,8 @@ pip install matplotlib numpy wxPython==4.1.0 xlrd==1.2.0 openpyxl pillow urllib3
 英語環境で使えば，英語表記になるはずです．
 強制的に英語表記にしたい場合，matplotlibwx.pyをテキストエディタで開き，先頭付近に書いてある#languages = ['en']のコメントを外して保存してから実行して下さい．
 
+matplotlibwxは[ここ](https://github.com/gitwamoto/matplotlibwx)からダウンロードできます．
+
 ---
 
 This is a Python script for drawing scatter plots, vector plots, and color contours using Python's matplotlib and wxPython with GUI operations.
@@ -24,3 +26,5 @@ pip install matplotlib numpy wxPython==4.1.0 xlrd==1.2.0 openpyxl pillow urllib3
 
 If you use it in an English environment, it should be written in English.
 If you want to force it to be in English, open matplotlibwx.py in a text editor, uncomment #languages = ['en'] near the top, save the file, and run it.
+
+You can download matplotlibwx from [here](https://github.com/gitwamoto/matplotlibwx).

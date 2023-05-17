@@ -1,8 +1,0 @@
-以下をコマンドプロンプトかターミナルで実行して下さい．
-
-pip install matplotlib numpy wxPython==4.1.0 xlrd==1.2.0 openpyxl pillow urllib3 requests pyperclip
-
-
-matplotlibwx.pyは以下のアドレスからダウンロードできます．
-
-https://drive.google.com/file/d/18jsRVeShgjhvKi_X6m9z-JQKlHkedDnT/view?usp=sharing
