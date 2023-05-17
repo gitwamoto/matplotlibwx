@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 # matplotlibwx.py
 # by Yukiharu Iwamoto
-# 2023/5/17 8:05:12 PM
+# 2023/5/17 8:18:00 PM
 
 # Macの場合，文字入力後に引用符が勝手に変わったりしてうまく動かない．
 # 「システム環境設定」→「キーボード」→「ユーザー辞書」→「スマート引用符とスマートダッシュを使用」のチェックを外す．
 
-version = '2023/5/17 8:05:12 PM'
+version = '2023/5/17 8:18:00 PM'
 
 import os
 languages = os.environ.get('LANG')
@@ -4024,7 +4024,8 @@ class FrameMain(wx.Frame):
             with codecs.open(p, 'w', encoding = 'UTF-8') as f:
                 f.write(s)
             try:
-                d = os.path.join(os.path.dirname(p), u'locale', u'en', u'LC_MESSAGES')
+                pd = os.path.dirname(p)
+                d = os.path.join(pd, u'locale', u'en', u'LC_MESSAGES')
                 if not os.path.isdir(d):
                     os.makedirs(d)
                 with open(os.path.join(d, u'messages.mo'), 'wb') as f:
@@ -4034,9 +4035,14 @@ class FrameMain(wx.Frame):
                 with open(os.path.join(d, u'messages.po'), 'wb') as f:
                     f.write(get_file_from_github_public(user = 'gitwamoto', repository = 'matplotlibwx',
                         branch = 'main', file_path = 'locale/en/LC_MESSAGES/messages.po'))
-                with codecs.open(os.path.join(os.path.dirname(p), u'locale', u'messages.pot'), 'w', encoding = 'UTF-8') as f:
+                with codecs.open(os.path.join(pd, u'locale', u'messages.pot'), 'w', encoding = 'UTF-8') as f:
                     f.write(get_file_from_github_public(user = 'gitwamoto', repository = 'matplotlibwx',
                         branch = 'main', file_path = 'locale/messages.pot'))
+                with codecs.open(os.path.join(pd, u'README.md'), 'w', encoding = 'UTF-8') as f:
+                    f.write(get_file_from_github_public(user = 'gitwamoto', repository = 'matplotlibwx',
+                        branch = 'main', file_path = 'README.md'))
+                if os.path.isfile(os.path.join(pd, u'modules_needed.txt')):
+                    os.remove(os.path.join(pd, u'modules_needed.txt'))
             except:
 #                print(sys.exc_info())
                 pass
