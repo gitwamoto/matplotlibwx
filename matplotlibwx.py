@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 # matplotlibwx.py
 # by Yukiharu Iwamoto
-# 2023/5/17 8:22:16 PM
+# 2023/5/17 8:30:33 PM
 
 # Macの場合，文字入力後に引用符が勝手に変わったりしてうまく動かない．
 # 「システム環境設定」→「キーボード」→「ユーザー辞書」→「スマート引用符とスマートダッシュを使用」のチェックを外す．
 
-version = '2023/5/17 8:22:16 PM'
+version = '2023/5/17 8:30:33 PM'
 
 import os
 languages = os.environ.get('LANG')
@@ -4035,7 +4035,7 @@ class FrameMain(wx.Frame):
                 with open(os.path.join(d, u'messages.po'), 'wb') as f:
                     f.write(get_file_from_github_public(user = 'gitwamoto', repository = 'matplotlibwx',
                         branch = 'main', file_path = 'locale/en/LC_MESSAGES/messages.po'))
-                with codecs.open(os.path.join(pd, u'locale', u'messages.pot'), 'w', encoding = 'UTF-8') as f:
+                with open(os.path.join(pd, u'locale', u'messages.pot'), 'wb') as f:
                     f.write(get_file_from_github_public(user = 'gitwamoto', repository = 'matplotlibwx',
                         branch = 'main', file_path = 'locale/messages.pot'))
                 with open(os.path.join(pd, u'README.md'), 'wb') as f:
