@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 # matplotlibwx.py
 # by Yukiharu Iwamoto
-# 2023/4/27 4:16:34 PM
+# 2023/5/17 12:37:41 PM
 
 # Macの場合，文字入力後に引用符が勝手に変わったりしてうまく動かない．
 # 「システム環境設定」→「キーボード」→「ユーザー辞書」→「スマート引用符とスマートダッシュを使用」のチェックを外す．
 
-version = '2023/4/27 4:16:34 PM'
+version = '2023/5/17 12:37:41 PM'
 
 import os
 languages = os.environ.get('LANG')
@@ -126,10 +126,17 @@ by_what_show_z_wx = (_(u'虹色'), _(u'白→黒'), _(u'黒→白'), _(u'白→�
 paint_styles = ('rainbow', 'wb', 'bw', 'wR', 'wB', None) # str
 paint_styles_wx = (_(u'虹色'), _(u'白→黒'), _(u'黒→白'), _(u'白→赤'), _(u'白→青'), _(u'塗りなし')) # unicode
 
-def get_file_from_google_drive(file_id):
+def get_file_from_google_drive(file_id, binary = False):
     try:
         r = requests.get('https://drive.google.com/uc', params = (('export', 'download'), ('id', file_id)))
         r.encoding = r.apparent_encoding
+        if binary:
+            CHUNK_SIZE = 32768
+            b = b''
+            for chunk in r.iter_content(CHUNK_SIZE):
+                if chunk:
+                    b += chunk
+            return b # Pthon 2 -> str, Python 3 -> bytes
         if r.text.find('Google Drive - Virus scan warning') != -1:
             cookies = r.cookies.get_dict()
             if cookies:
@@ -148,7 +155,7 @@ def get_file_from_google_drive(file_id):
             r = requests.get('https://drive.google.com/uc',
                 params = (('export', 'download'), ('confirm', code), ('id', file_id)), cookies = cookies)
             r.encoding = r.apparent_encoding
-        return r.text # unicode
+        return r.text # Pthon 2 -> unicode, Python 3 -> bytes
     except:
 #        print(sys.exc_info())
         raise
@@ -4021,7 +4028,7 @@ class FrameMain(wx.Frame):
                 if not os.path.isdir(d):
                     os.makedirs(d)
                 with open(os.path.join(d, u'messages.mo'), 'wb') as f:
-                    f.write(get_file_from_google_drive('1xVuaz179QpwFxb2Xf0zJFkn1x0HT_plC'))
+                    f.write(get_file_from_google_drive('1xVuaz179QpwFxb2Xf0zJFkn1x0HT_plC', binary = True))
             except:
 #                print(sys.exc_info())
                 pass
@@ -4055,5 +4062,7 @@ if __name__ == '__main__':
             t = sys.argv[2] if len(sys.argv) > 2 else 'template.txt'
             t = make_template(decode_if_necessary(t))
             print(u'Template file \'%s\' has be made.' % t)
+            with open('bbb_b.txt', 'wb') as f:
+                f.write(b) # mac + python 2 -> success, mac + python 3 -> ?
         else:
             plot(load_plot_settings(os.path.abspath(decode_if_necessary(sys.argv[1])))[0], show = True)
