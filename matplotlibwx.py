@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 # matplotlibwx.py
 # by Yukiharu Iwamoto
-# 2023/5/17 8:41:24 PM
+# 2023/5/18 10:34:34 AM
 
 # Macの場合，文字入力後に引用符が勝手に変わったりしてうまく動かない．
 # 「システム環境設定」→「キーボード」→「ユーザー辞書」→「スマート引用符とスマートダッシュを使用」のチェックを外す．
 
-version = '2023/5/17 8:41:24 PM'
+version = '2023/5/18 10:34:34 AM'
 
 import os
 languages = os.environ.get('LANG')
@@ -126,18 +126,10 @@ by_what_show_z_wx = (_(u'虹色'), _(u'白→黒'), _(u'黒→白'), _(u'白→�
 paint_styles = ('rainbow', 'wb', 'bw', 'wR', 'wB', None) # str
 paint_styles_wx = (_(u'虹色'), _(u'白→黒'), _(u'黒→白'), _(u'白→赤'), _(u'白→青'), _(u'塗りなし')) # unicode
 
-def get_file_from_google_drive(file_id, binary = False):
-    try:
-        r = requests.get('https://drive.google.com/uc', params = (('export', 'download'), ('id', file_id)))
-        r.encoding = r.apparent_encoding
-        if binary:
-            CHUNK_SIZE = 32768
-            b = b''
-            for chunk in r.iter_content(CHUNK_SIZE):
-                if chunk:
-                    b += chunk
-            return b # Pthon 2 -> str, Python 3 -> bytes
-        if r.text.find('Google Drive - Virus scan warning') != -1:
+def get_file_from_google_drive(file_id):
+    r = requests.get('https://drive.google.com/uc', params = {'export': 'download', 'id': file_id})
+    if r.ok:
+        if b'Google Drive - Virus scan warning' in r.content:
             cookies = r.cookies.get_dict()
             if cookies:
                 for k in cookies.keys():
@@ -145,24 +137,27 @@ def get_file_from_google_drive(file_id, binary = False):
                         code = cookies[k]
                         break
             else: # https://github.com/wkentaro/gdown/blob/1bf9e20442a0df57eec3e75a15ef4115dbec9b2f/gdown/download.py#L32
-                m = re.search('id="downloadForm" action=".+?&amp;confirm=(.+?)"', r.text)
+                m = re.search(b'id="downloadForm" action=".+?&amp;confirm=(.+?)"', r.content)
                 if m:
                     code = m.group(1)
                 else:
-                    m = re.search('&amp;confirm=t&amp;uuid=(.+?)"', r.text)
+                    m = re.search(b'&amp;confirm=t&amp;uuid=(.+?)"', r.content)
                     if m:
                         code = m.group(1)
             r = requests.get('https://drive.google.com/uc',
-                params = (('export', 'download'), ('confirm', code), ('id', file_id)), cookies = cookies)
-            r.encoding = r.apparent_encoding
-        return r.text # Pthon 2 -> unicode, Python 3 -> str
-    except:
-#        print(sys.exc_info())
-        raise
+                params = {'export': 'download', 'confirm': code, 'id': file_id}, cookies = cookies)
+            if not r.ok:
+                return None
+        return r.content, r.apparent_encoding # type(r.content) = str (Python 2); bytes (Python 3)
+    else:
+        return None
 
 def get_file_from_github_public(user, repository, branch, file_path):
     r = requests.get('https://raw.githubusercontent.com/' + user + '/' + repository + '/' + branch + '/' + file_path)
-    return r.content # Pthon 2 -> str, Python 3 -> bytes
+    if r.ok:
+        return r.content, r.apparent_encoding # type(r.content) = str (Python 2); bytes (Python 3)
+    else:
+        return None
 
 def naca_4digits_airfoil(digits, points = 51):
     # Example:
@@ -4008,44 +4003,46 @@ class FrameMain(wx.Frame):
                 print(sys.exc_info())
 
     def menuItem_updateOnMenuSelection(self, event):
-        try:
-#           s = get_file_from_google_drive('18jsRVeShgjhvKi_X6m9z-JQKlHkedDnT')
-            s = get_file_from_github_public(user = 'gitwamoto', repository = 'matplotlibwx',
-                branch = 'main', file_path = 'matplotlibwx.py').decode('UTF-8')
-        except:
+#       s = get_file_from_google_drive('18jsRVeShgjhvKi_X6m9z-JQKlHkedDnT')
+        s = get_file_from_github_public(user = 'gitwamoto', repository = 'matplotlibwx',
+            branch = 'main', file_path = 'matplotlibwx.py')
+        if s is None:
             with wx.MessageDialog(self,
                 _(u'Googleドライブに接続できませんでした．後でやり直して下さい．'),
                 _(u'接続エラー'), style = wx.ICON_ERROR) as md:
                 md.ShowModal()
             return
-        r = re.search(r"version\s*=\s*'([0-9/ :APM]+)'\n", s)
-        if r is not None and time_str_a_is_newer_than_b(a = r.group(1), b = version):
+        r = re.search(b"version\s*=\s*'([0-9/ :APM]+)'\n", s[0])
+        if r is not None and time_str_a_is_newer_than_b(a = r.group(1).decode(s[1]), b = version):
             p = correct_file_name_in_unicode(os.path.realpath(decode_if_necessary(__file__)))
-            with codecs.open(p, 'w', encoding = 'UTF-8') as f:
-                f.write(s)
-            try:
-                pd = os.path.dirname(p)
-                d = os.path.join(pd, u'locale', u'en', u'LC_MESSAGES')
-                if not os.path.isdir(d):
-                    os.makedirs(d)
+            with open(p, 'wb') as f:
+                f.write(s[0])
+            pd = os.path.dirname(p)
+            d = os.path.join(pd, u'locale', u'en', u'LC_MESSAGES')
+            if not os.path.isdir(d):
+                os.makedirs(d)
+            s = get_file_from_github_public(user = 'gitwamoto', repository = 'matplotlibwx',
+                branch = 'main', file_path = 'locale/en/LC_MESSAGES/messages.mo')
+            if s is not None:
                 with open(os.path.join(d, u'messages.mo'), 'wb') as f:
-#                    f.write(get_file_from_google_drive('1xVuaz179QpwFxb2Xf0zJFkn1x0HT_plC', binary = True))
-                    f.write(get_file_from_github_public(user = 'gitwamoto', repository = 'matplotlibwx',
-                        branch = 'main', file_path = 'locale/en/LC_MESSAGES/messages.mo'))
+                    f.write(s[0])
+            s = get_file_from_github_public(user = 'gitwamoto', repository = 'matplotlibwx',
+                branch = 'main', file_path = 'locale/en/LC_MESSAGES/messages.po')
+            if s is not None:
                 with open(os.path.join(d, u'messages.po'), 'wb') as f:
-                    f.write(get_file_from_github_public(user = 'gitwamoto', repository = 'matplotlibwx',
-                        branch = 'main', file_path = 'locale/en/LC_MESSAGES/messages.po'))
+                    f.write(s[0])
+            s = get_file_from_github_public(user = 'gitwamoto', repository = 'matplotlibwx',
+                branch = 'main', file_path = 'locale/messages.pot')
+            if s is not None:
                 with open(os.path.join(pd, u'locale', u'messages.pot'), 'wb') as f:
-                    f.write(get_file_from_github_public(user = 'gitwamoto', repository = 'matplotlibwx',
-                        branch = 'main', file_path = 'locale/messages.pot'))
+                    f.write(s[0])
+            s = get_file_from_github_public(user = 'gitwamoto', repository = 'matplotlibwx',
+                branch = 'main', file_path = 'README.md')
+            if s is not None:
                 with open(os.path.join(pd, u'README.md'), 'wb') as f:
-                    f.write(get_file_from_github_public(user = 'gitwamoto', repository = 'matplotlibwx',
-                        branch = 'main', file_path = 'README.md'))
-                if os.path.isfile(os.path.join(pd, u'modules_needed.txt')):
-                    os.remove(os.path.join(pd, u'modules_needed.txt'))
-            except:
-#                print(sys.exc_info())
-                pass
+                    f.write(s[0])
+            if os.path.isfile(os.path.join(pd, u'modules_needed.txt')):
+                os.remove(os.path.join(pd, u'modules_needed.txt'))
             if sys.platform != 'darwin':
                 for curDir, dirs, files in os.walk(os.path.dirname(p)):
                     for name in files:
