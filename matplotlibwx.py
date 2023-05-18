@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 # matplotlibwx.py
 # by Yukiharu Iwamoto
-# 2023/5/18 10:34:34 AM
+# 2023/5/18 5:20:03 PM
 
 # Macの場合，文字入力後に引用符が勝手に変わったりしてうまく動かない．
 # 「システム環境設定」→「キーボード」→「ユーザー辞書」→「スマート引用符とスマートダッシュを使用」のチェックを外す．
 
-version = '2023/5/18 10:34:34 AM'
+version = '2023/5/18 5:20:03 PM'
 
 import os
 languages = os.environ.get('LANG')
@@ -4008,7 +4008,7 @@ class FrameMain(wx.Frame):
             branch = 'main', file_path = 'matplotlibwx.py')
         if s is None:
             with wx.MessageDialog(self,
-                _(u'Googleドライブに接続できませんでした．後でやり直して下さい．'),
+                _(u'GitHubに接続できませんでした．後でやり直して下さい．'),
                 _(u'接続エラー'), style = wx.ICON_ERROR) as md:
                 md.ShowModal()
             return
