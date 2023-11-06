@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 # matplotlibwx.py
 # by Yukiharu Iwamoto
-# 2023/5/18 5:20:03 PM
+# 2023/11/6 2:49:50 PM
 
 # Macの場合，文字入力後に引用符が勝手に変わったりしてうまく動かない．
 # 「システム環境設定」→「キーボード」→「ユーザー辞書」→「スマート引用符とスマートダッシュを使用」のチェックを外す．
 
-version = '2023/5/18 5:20:03 PM'
+version = '2023/11/6 2:49:50 PM'
 
 import os
 languages = os.environ.get('LANG')
@@ -320,7 +320,7 @@ def data_from_file(file_name, columns = (1, 2), every = 1, skip = '#', delimiter
                 if type(j) is list:
                     n_lines = min(n_lines, len(lines) - j[1])
         for n in range(n_lines):
-            stop = False
+            stop = has_None = False
             for i in range(len(columns1)):
                 try:
                     s = u''
@@ -340,12 +340,15 @@ def data_from_file(file_name, columns = (1, 2), every = 1, skip = '#', delimiter
                         else:
                             s += columns1[i][j]
                     data[i].append(eval(s, param_dict))
+                    if data[i][-1] is None:
+                        has_None = True
                 except:
                     data[i].append(np.nan)
-            if stop:
+            if stop or has_None:
                 for i in range(len(data)):
                     del data[i][-1]
-                break
+                if stop:
+                    break
     elif file_name.endswith(u'.xls') or file_name.endswith(u'.xlsx'):
         columns1 = []
         for i in columns:
@@ -382,7 +385,7 @@ def data_from_file(file_name, columns = (1, 2), every = 1, skip = '#', delimiter
                 if type(j) is list:
                     n_lines = len(lines[j[0]]) - j[2] if n_lines is None else min(n_lines, len(lines[j[0]]) - j[2])
         for n in range(n_lines):
-            stop = False
+            stop = has_None = False
             for i in range(len(columns1)):
                 try:
                     s = u''
@@ -403,13 +406,16 @@ def data_from_file(file_name, columns = (1, 2), every = 1, skip = '#', delimiter
                         else:
                             s += columns1[i][j]
                     data[i].append(eval(s, param_dict))
+                    if data[i][-1] is None:
+                        has_None = True
                 except:
 #                    print(sys.exc_info())
                     data[i].append(np.nan)
-            if stop:
+            if stop or has_None:
                 for i in range(len(data)):
                     del data[i][-1]
-                break
+                if stop:
+                    break
     else:
         columns1 = []
         for i in columns:
@@ -443,7 +449,7 @@ def data_from_file(file_name, columns = (1, 2), every = 1, skip = '#', delimiter
             line = line.split(delimiter)
             if len(line) < 2:
                 raise ValueError('Inappropriate delimiter.')
-            stop = False
+            stop = has_None = False
             for i, j in enumerate(columns1):
                 try:
                     if type(j) is int:
@@ -463,17 +469,19 @@ def data_from_file(file_name, columns = (1, 2), every = 1, skip = '#', delimiter
                             else:
                                 s += k
                         data[i].append(eval(s, param_dict))
+                    if data[i][-1] is None:
+                        has_None = True
                 except:
                     data[i].append(np.nan)
-            if stop:
+            if stop or has_None:
                 for i in range(len(data)):
                     del data[i][-1]
-                break
+                if stop:
+                    break
     if zip_file:
         os.remove(file_name)
     if every != 1:
-        for i in range(len(data)):
-            data[i] = data[i][::every]
+        data = [data[i][::every] for i in range(len(data))]
     return np.array(data)
 
 x_max = None
