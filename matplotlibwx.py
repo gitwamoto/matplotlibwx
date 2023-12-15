@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 # matplotlibwx.py
 # by Yukiharu Iwamoto
-# 2023/11/6 2:49:50 PM
+# 2023/12/15 7:21:34 PM
 
 # Macの場合，文字入力後に引用符が勝手に変わったりしてうまく動かない．
 # 「システム環境設定」→「キーボード」→「ユーザー辞書」→「スマート引用符とスマートダッシュを使用」のチェックを外す．
 
-version = '2023/11/6 2:49:50 PM'
+version = '2023/12/15 7:21:34 PM'
 
 import os
 languages = os.environ.get('LANG')
@@ -865,7 +865,7 @@ def plot_vector(data, ranges = (None, None, None), ticks = (None, None, None), l
 
 def plot_contour(data, ranges = (None, None, None), ticks = (None, None, None), log_scale = (False, False, False),
     fig_size = None, aspect = 'auto', graph_edges = None, title = None, labels = None, grids = (False, False),
-    paint = 'rainbow', smooth_paint = True, structured_grid = None, zorder = 0):
+    paint = 'rainbow', smooth_paint = True, structured_grid = None, show_triangle = False, zorder = 0):
     # fig_size = None | tuple | 'reflesh'
     # aspect = None | 'auto' | 'equal' | number
     # graph_edges = None | (left, bottom, right, top)
@@ -912,6 +912,8 @@ def plot_contour(data, ranges = (None, None, None), ticks = (None, None, None), 
             locator = ticker.LogLocator(base = 10.0 if ticks[2] is None else ticks[2])
             levels = 10.0**np.arange(log10_l, log10_r + 0.1)
             if structured_grid is None:
+                if show_triangle:
+                    plt.triplot(triang, color = 'dimgray', linewidth = 0.5, zorder = zorder + 0.2)
                 plt.tricontour(triang, data[2], levels, colors = 'black', linewidths = 0.7, locator = locator,
                     zorder = zorder + 0.1)
             else:
@@ -945,6 +947,8 @@ def plot_contour(data, ranges = (None, None, None), ticks = (None, None, None), 
             t = np.arange(l, r + 0.1*t, t)
             t[np.abs(t) < 1.0e-10*abs(r - l)] = 0.0
             if structured_grid is None:
+                if show_triangle:
+                    plt.triplot(triang, color = 'dimgray', linewidth = 0.5, zorder = zorder + 0.2)
                 plt.tricontour(triang, data[2], t, colors = 'black', linewidths = 0.7, zorder = zorder + 0.1)
             else:
                 plt.contour(data[0], data[1], data[2], t, colors = 'black', linewidths = 0.7, zorder = zorder + 0.1)
@@ -1440,6 +1444,9 @@ def make_template(file_name = u'template.txt'):
         f.write(u"# 'grid_pattern': True # → データが碁盤の目状に並んでいる\n")
         f.write(u"# 'grid_pattern': False # → データが碁盤の目状に並んでいない\n")
         f.write(u"    'grid_pattern': False,\n")
+        f.write(u"# 'show_triangle': True # → データが碁盤の目状に並んでいない時に行う，デローニー分割した三角形を表示する\n")
+        f.write(u"# 'show_triangle': False # → データが碁盤の目状に並んでいない時に行う，デローニー分割した三角形を表示しない\n")
+        f.write(u"    'show_triangle': False,\n")
         f.write(u"# <テキストファイルの場合>\n")
         f.write(u"#  'columns': (1, 2, 3) # → 1, 2, 3列目の値をそれぞれx, y, z軸のデータに使う\n")
         f.write(u"#  'columns': ('$1/$2', 'sqrt($3)*10', 3)\n" +
@@ -2869,6 +2876,8 @@ class FrameMain(wx.Frame):
             wx.DefaultPosition, wx.DefaultSize, 0)
         self.textCtrl_vector_legend_x.SetToolTip(_(u'凡例矢印先端の横座標，0/1だとグラフ枠の左/右端'))
         self.textCtrl_vector_legend_x.SetMinSize(wx.Size(60, -1))
+        if sys.version_info.major <= 2:
+            self.textCtrl_vector_legend_x.Disable()
         bSizer3.Add(self.textCtrl_vector_legend_x, 0, wx.ALIGN_CENTER_VERTICAL | wx.TOP | wx.BOTTOM, 5)
 
         staticText1 = wx.StaticText(sbSizer1.GetStaticBox(), wx.ID_ANY, _(u'縦座標：'),
@@ -2880,6 +2889,8 @@ class FrameMain(wx.Frame):
             wx.DefaultPosition, wx.DefaultSize, 0)
         self.textCtrl_vector_legend_y.SetToolTip(_(u'凡例矢印先端の縦座標，0/1だとグラフ枠の下/上端'))
         self.textCtrl_vector_legend_y.SetMinSize(wx.Size(60, -1))
+        if sys.version_info.major <= 2:
+            self.textCtrl_vector_legend_y.Disable()
         bSizer3.Add(self.textCtrl_vector_legend_y, 0, wx.ALIGN_CENTER_VERTICAL | wx.TOP | wx.BOTTOM, 5)
 
         staticText1 = wx.StaticText(sbSizer1.GetStaticBox(), wx.ID_ANY, _(u'矢印長さ：'),
@@ -2890,6 +2901,8 @@ class FrameMain(wx.Frame):
         self.textCtrl_vector_legend_u = wx.TextCtrl(sbSizer1.GetStaticBox(), wx.ID_ANY, u'1.0',
             wx.DefaultPosition, wx.DefaultSize, 0)
         self.textCtrl_vector_legend_u.SetMinSize(wx.Size(60, -1))
+        if sys.version_info.major <= 2:
+            self.textCtrl_vector_legend_u.Disable()
         bSizer3.Add(self.textCtrl_vector_legend_u, 0, wx.ALIGN_CENTER_VERTICAL | wx.TOP | wx.BOTTOM, 5)
 
         staticText1 = wx.StaticText(sbSizer1.GetStaticBox(), wx.ID_ANY, _(u'ラベル：'),
@@ -2900,6 +2913,8 @@ class FrameMain(wx.Frame):
         self.textCtrl_vector_legend_label = wx.TextCtrl(sbSizer1.GetStaticBox(), wx.ID_ANY, wx.EmptyString,
             wx.DefaultPosition, wx.Size(-1, -1), 0)
         self.textCtrl_vector_legend_label.SetToolTip(tooltip_tex)
+        if sys.version_info.major <= 2:
+            self.textCtrl_vector_legend_label.Disable()
         bSizer3.Add(self.textCtrl_vector_legend_label, 1, wx.ALIGN_CENTER_VERTICAL | wx.TOP | wx.BOTTOM | wx.RIGHT, 5)
 
         sbSizer1.Add(bSizer3, 0, wx.EXPAND, 5)
@@ -2948,6 +2963,13 @@ class FrameMain(wx.Frame):
         self.checkBox_contour_grid_pattern.SetToolTip(_(u'データが碁盤の目状に並んでいる時にチェックを付けると，描画が高速になります．'))
         self.checkBox_contour_grid_pattern.SetValue(False)
         bSizer3.Add(self.checkBox_contour_grid_pattern, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
+
+        self.checkBox_contour_show_triangle = wx.CheckBox(sbSizer1.GetStaticBox(), wx.ID_ANY, _(u'三角形を表示'),
+            wx.DefaultPosition, wx.DefaultSize, 0)
+        self.checkBox_contour_show_triangle.SetToolTip(_(u'「碁盤の目状」にチェックがついていない時に行う，デローニー分割した三角形を表示します．'))
+        self.checkBox_contour_show_triangle.SetValue(False)
+        bSizer3.Add(self.checkBox_contour_show_triangle, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
+        self.checkBox_contour_grid_patternOnCheck(None)
 
         staticText1 = wx.StaticText(sbSizer1.GetStaticBox(), wx.ID_ANY, _(u'xの列：'),
             wx.DefaultPosition, wx.DefaultSize, 0)
@@ -3113,6 +3135,7 @@ class FrameMain(wx.Frame):
             i.Bind(wx.EVT_BUTTON, self.button_openOnButtonClick)
         self.button_vector_open_file.Bind(wx.EVT_BUTTON, self.button_openOnButtonClick)
         self.button_contour_open_file.Bind(wx.EVT_BUTTON, self.button_openOnButtonClick)
+        self.checkBox_contour_grid_pattern.Bind(wx.EVT_CHECKBOX, self.checkBox_contour_grid_patternOnCheck)
         self.Bind(wx.EVT_MENU, self.menuItem_openOnMenuSelection, id = self.menuItem_open.GetId())
         self.Bind(wx.EVT_MENU, self.FrameMainOnClose, id = self.menuItem_close.GetId())
         self.Bind(wx.EVT_MENU, self.menuItem_saveOnMenuSelection, id = self.menuItem_save.GetId())
@@ -3226,6 +3249,12 @@ class FrameMain(wx.Frame):
         if row != 0:
             grid.table.data[row], grid.table.data[row - 1] = grid.table.data[row - 1], grid.table.data[row]
             grid.SetGridCursor(row - 1, col)
+
+    def checkBox_contour_grid_patternOnCheck(self, event):
+        if self.checkBox_contour_grid_pattern.GetValue():
+            self.checkBox_contour_show_triangle.Disable()
+        else:
+            self.checkBox_contour_show_triangle.Enable()
 
     def load_settings(self, path):
         s, path = load_plot_settings(path)
@@ -3543,6 +3572,7 @@ class FrameMain(wx.Frame):
                     print(sys.exc_info())
                 self.checkBox_contour_grid_pattern.SetValue((True if x['structured_grid'] is not None else False)
                     if 'structured_grid' in x else False)
+                self.checkBox_contour_show_triangle.SetValue(x['show_triangle'] if 'show_triangle' in x else False)
                 for i, j in ((self.textCtrl_contour_column_x, 0), (self.textCtrl_contour_column_y, 1),
                              (self.textCtrl_contour_column_z, 2)):
                     try:
@@ -3903,6 +3933,7 @@ class FrameMain(wx.Frame):
                     os.path.relpath(self.filePicker_contour.GetPath(), start = os.path.dirname(path)))
                 s += u"    'file_name': '{}',\n".format(fn.replace("\\", r"\\").replace("'", r"\'"))
                 s += u"    'grid_pattern': " + str(self.checkBox_contour_grid_pattern.GetValue()) + u",\n"
+                s += u"    'show_triangle': " + str(self.checkBox_contour_show_triangle.GetValue()) + u",\n"
                 s += u"    'columns': ("
                 for i in (self.textCtrl_contour_column_x.GetValue(),
                           self.textCtrl_contour_column_y.GetValue(),
