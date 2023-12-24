@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 # matplotlibwx.py
 # by Yukiharu Iwamoto
-# 2023/12/15 7:21:34 PM
+# 2023/12/24 8:32:50 PM
 
 # Macの場合，文字入力後に引用符が勝手に変わったりしてうまく動かない．
 # 「システム環境設定」→「キーボード」→「ユーザー辞書」→「スマート引用符とスマートダッシュを使用」のチェックを外す．
 
-version = '2023/12/15 7:21:34 PM'
+version = '2023/12/24 8:32:50 PM'
 
 import os
 languages = os.environ.get('LANG')
@@ -1280,8 +1280,8 @@ def make_template(file_name = u'template.txt'):
         f.write(u"# x, y軸の目盛線，(True, False) → x軸の目盛線を長く描き，y軸は刻みだけ描く\n")
         f.write(u"    'grids': (False, False),\n")
         f.write(u"# 'aspect': 'auto' # → グラフの縦横比を特に指定しない\n")
-        f.write(u"# 'aspect': 'equal' # → x, y軸方向に1だけ進む長さを等しくする\n")
-        f.write(u"# 'aspect': 3.0 # → y軸の長さをx軸の長さの3.0倍にする\n")
+        f.write(u"# 'aspect': 'equal' # → x, y軸方向に1進む長さを等しくする\n")
+        f.write(u"# 'aspect': 3.0 # → y軸方向に1進む長さをx軸のそれの3.0倍にする\n")
         f.write(u"    'aspect': 'equal',\n")
         f.write(u"# 'title': 'graph for $\\mathsf{a_{xy}^2}$'\n" +
             u"#     → グラフの上に書く題名，$\\mathsf{ と }$ の間に書くとTeX形式になる\n")
@@ -2217,7 +2217,7 @@ class FrameMain(wx.Frame):
         self.checkBox_y_grid.SetValue(False)
         bSizer3.Add(self.checkBox_y_grid, 0, wx.ALIGN_CENTER_VERTICAL | wx.ALL, 5)
 
-        staticText1 = wx.StaticText(sbSizer1.GetStaticBox(), wx.ID_ANY, _(u'y軸の長さ/x軸の長さ：'),
+        staticText1 = wx.StaticText(sbSizer1.GetStaticBox(), wx.ID_ANY, _(u'y軸を1進む長さ/x軸を1進む長さ：'),
             wx.DefaultPosition, wx.DefaultSize, 0)
         staticText1.Wrap(-1)
         bSizer3.Add(staticText1, 0, wx.ALIGN_CENTER_VERTICAL | wx.TOP | wx.BOTTOM | wx.LEFT, 5)
@@ -2227,7 +2227,7 @@ class FrameMain(wx.Frame):
         self.comboBox_aspect.SetValue(u"auto")
         self.comboBox_aspect.SetForegroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_WINDOWTEXT))
         self.comboBox_aspect.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_WINDOW))
-        self.comboBox_aspect.SetToolTip(_(u'数値またはauto, equal\nequalはx, y軸方向に1だけ進む長さを等しくします．'))
+        self.comboBox_aspect.SetToolTip(_(u'数値またはauto, equal\n数値は(y軸の長さ)/(x軸の長さ)*(x軸の最大値-最小値)/(y軸の最大値-最小値)の値を入力します．\nequalは1と同じ意味です．'))
         bSizer3.Add(self.comboBox_aspect, 0, wx.ALIGN_CENTER_VERTICAL | wx.TOP | wx.BOTTOM | wx.RIGHT, 5)
 
         staticText1 = wx.StaticText(sbSizer1.GetStaticBox(), wx.ID_ANY, _(u'グラフの上に書く題名：'),

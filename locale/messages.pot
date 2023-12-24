@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-15 19:25+0900\n"
+"POT-Creation-Date: 2023-12-24 20:33+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -433,13 +433,15 @@ msgid "y軸目盛線"
 msgstr ""
 
 #: matplotlibwx.py:2220
-msgid "y軸の長さ/x軸の長さ："
+msgid "y軸を1進む長さ/x軸を1進む長さ："
 msgstr ""
 
 #: matplotlibwx.py:2230
 msgid ""
 "数値またはauto, equal\n"
-"equalはx, y軸方向に1だけ進む長さを等しくします．"
+"数値は(y軸の長さ)/(x軸の長さ)*(x軸の最大値-最小値)/(y軸の最大値-最小値)の値を"
+"入力します．\n"
+"equalは1と同じ意味です．"
 msgstr ""
 
 #: matplotlibwx.py:2233

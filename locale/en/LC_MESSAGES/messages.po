@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-15 19:25+0900\n"
+"POT-Creation-Date: 2023-12-24 20:33+0900\n"
 "PO-Revision-Date: 2019-09-02 21:52+0900\n"
 "Last-Translator: Yukiharu Iwamoto <iwamoto@iwamoto-4.local>\n"
 "Language-Team: English\n"
@@ -459,16 +459,18 @@ msgid "y軸目盛線"
 msgstr "y grid"
 
 #: matplotlibwx.py:2220
-msgid "y軸の長さ/x軸の長さ："
-msgstr "Lenght ratio of y-axis/x-axis:"
+msgid "y軸を1進む長さ/x軸を1進む長さ："
+msgstr "Unit length in y-axis/x-axis:"
 
 #: matplotlibwx.py:2230
 msgid ""
 "数値またはauto, equal\n"
-"equalはx, y軸方向に1だけ進む長さを等しくします．"
+"数値は(y軸の長さ)/(x軸の長さ)*(x軸の最大値-最小値)/(y軸の最大値-最小値)の値を入力します．\n"
+"equalは1と同じ意味です．"
 msgstr ""
-"Number or \"auto\", \"equal\"\n"
-"\"equal\" makes the unit length in x and y-axis be the same."
+"number or auto, equal\n"
+"number corresponds to (length of y-axis)/(length of x-axis)*(max - min value in x-axis)/(max - min value in y-axis)\n"
+"equal is the same as 1."
 
 #: matplotlibwx.py:2233
 msgid "グラフの上に書く題名："
