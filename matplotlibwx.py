@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # matplotlibwx.py
 # by Yukiharu Iwamoto
-# 2023/12/24 8:32:50 PM
+# 2024/1/10 9:57:12 AM
 
 # Macの場合，文字入力後に引用符が勝手に変わったりしてうまく動かない．
 # 「システム環境設定」→「キーボード」→「ユーザー辞書」→「スマート引用符とスマートダッシュを使用」のチェックを外す．
@@ -370,8 +370,7 @@ def data_from_file(file_name, columns = (1, 2), every = 1, skip = '#', delimiter
         data = [[] for i in range(len(columns1))]
         if file_name.endswith(u'.xls'):
             wb = xlrd.open_workbook(file_name)
-            lines = [[wb.sheet_by_index(i).row_values(j)
-                for j in range(wb.sheet_by_index(i).nrows)] for i in range(wb.nsheets)]
+            lines = [[ws.row_values(i) for i in range(ws.nrows)] for ws in wb.sheets()]
             # https://stackoverflow.com/questions/33241837/python-xlrd-book-how-to-close-the-files
             wb.release_resources()
             del wb
