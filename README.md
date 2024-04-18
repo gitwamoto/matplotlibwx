@@ -5,7 +5,7 @@ PythonのmatplotlibとwxPythonを利用して，散布図，ベクトル線図�
 
 以下のモジュールをpipでダウンロードして下さい：
 ```
-pip install matplotlib numpy wxPython==4.1.0 xlrd==1.2.0 openpyxl pillow urllib3 requests pyperclip
+pip install matplotlib numpy wxPython xlrd==1.2.0 openpyxl pillow urllib3 requests pyperclip
 ```
 
 英語環境で使えば，英語表記になるはずです．
@@ -21,7 +21,7 @@ Download the folder and run matplotlibwx.py in Python.
 
 Download the following modules with pip:
 ```
-pip install matplotlib numpy wxPython==4.1.0 xlrd==1.2.0 openpyxl pillow urllib3 requests pyperclip
+pip install matplotlib numpy wxPython xlrd==1.2.0 openpyxl pillow urllib3 requests pyperclip
 ```
 
 If you use it in an English environment, it should be written in English.

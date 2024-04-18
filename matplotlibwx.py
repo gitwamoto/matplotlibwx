@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 # matplotlibwx.py
 # by Yukiharu Iwamoto
-# 2024/1/10 9:57:12 AM
+# 2024/4/18 4:32:46 PM
 
 # Macの場合，文字入力後に引用符が勝手に変わったりしてうまく動かない．
 # 「システム環境設定」→「キーボード」→「ユーザー辞書」→「スマート引用符とスマートダッシュを使用」のチェックを外す．
 
-version = '2023/12/24 8:32:50 PM'
+version = '2024/4/18 4:32:46 PM'
 
 import os
 languages = os.environ.get('LANG')
@@ -1427,7 +1427,7 @@ def make_template(file_name = u'template.txt'):
         f.write(u"    'color': 'red',\n")
         f.write(u"# ベクトルの長さにかける倍率，大きいほど長く表示される\n")
         f.write(u"    'scale': 1.0,\n")
-        f.write(u"# legend: (0.8, 1.03, 1.0, r'$\mathsf{u/U_m}$')\n" +
+        f.write(u"# legend: (0.8, 1.03, 1.0, r'$\\mathsf{u/U_m}$')\n" +
             u"#     → 矢印先端の横方向座標を0.8，縦方向座標を1.03として，長さ1.0の矢印で凡例を付ける\n" +
             u"#       座標はグラフ左/下端を0，右/上端を1とした座標で指定する\n")
         f.write(u"# legend: None # → 凡例を付けない\n")
@@ -4050,7 +4050,7 @@ class FrameMain(wx.Frame):
                 _(u'接続エラー'), style = wx.ICON_ERROR) as md:
                 md.ShowModal()
             return
-        r = re.search(b"version\s*=\s*'([0-9/ :APM]+)'\n", s[0])
+        r = re.search(b"version\\s*=\\s*'([0-9/ :APM]+)'\n", s[0])
         if r is not None and time_str_a_is_newer_than_b(a = r.group(1).decode(s[1]), b = version):
             p = correct_file_name_in_unicode(os.path.realpath(decode_if_necessary(__file__)))
             with open(p, 'wb') as f:
@@ -4084,7 +4084,7 @@ class FrameMain(wx.Frame):
             if sys.platform != 'darwin':
                 for curDir, dirs, files in os.walk(os.path.dirname(p)):
                     for name in files:
-                        if re.match('\._.+|[._]+DS_Store', name):
+                        if re.match('\\._.+|[._]+DS_Store', name):
                             os.remove(os.path.join(curDir, name))
             with wx.MessageDialog(self, _(u'プログラムを実行し直すとアップデートが有効になります．'),
                 _(u'アップデート完了'), style = wx.ICON_INFORMATION) as md:
