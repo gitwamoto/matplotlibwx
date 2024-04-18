@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 # matplotlibwx.py
 # by Yukiharu Iwamoto
-# 2024/4/18 4:32:46 PM
+# 2024/4/18 4:43:35 PM
 
 # Macの場合，文字入力後に引用符が勝手に変わったりしてうまく動かない．
 # 「システム環境設定」→「キーボード」→「ユーザー辞書」→「スマート引用符とスマートダッシュを使用」のチェックを外す．
 
-version = '2024/4/18 4:32:46 PM'
+version = '2024/4/18 4:43:35 PM'
 
 import os
 languages = os.environ.get('LANG')
@@ -658,14 +658,14 @@ def insert_circle(x, y, width, radius, line_width = 1.0, fill = False, face_colo
 def insert_ellipse(x, y, width, height, angle = 0.0, line_width = 1.0, fill = False, face_color = 'white',
     edge_color = 'black', coordinate = 'axes', zorder = 0):
     # coordinate = 'axes' | 'data'
-    plt.gca().add_patch(patches.Ellipse((x, y), width, height, angle,
+    plt.gca().add_patch(patches.Ellipse((x, y), width, height, angle = angle,
         lw = line_width, fill = fill, fc = face_color, ec = edge_color,
         transform = plt.gca().transAxes if coordinate == 'axes' else plt.gca().transData, zorder = zorder))
 
 def insert_rectangle(x, y, width, height, angle = 0.0, line_width = 1.0, fill = False, face_color = 'white',
     edge_color = 'black', coordinate = 'axes', zorder = 0):
     # coordinate = 'axes' | 'data'
-    plt.gca().add_patch(patches.Rectangle((x - 0.5*width, y - 0.5*height), width, height, angle,
+    plt.gca().add_patch(patches.Rectangle((x - 0.5*width, y - 0.5*height), width, height, angle = angle,
         lw = line_width, fill = fill, fc = face_color, ec = edge_color,
         transform = plt.gca().transAxes if coordinate == 'axes' else plt.gca().transData, zorder = zorder))
 
