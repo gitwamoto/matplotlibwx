@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 # matplotlibwx.py
 # by Yukiharu Iwamoto
-# 2024/4/18 4:43:35 PM
+# 2024/4/28 8:32:55 PM
 
 # Macの場合，文字入力後に引用符が勝手に変わったりしてうまく動かない．
 # 「システム環境設定」→「キーボード」→「ユーザー辞書」→「スマート引用符とスマートダッシュを使用」のチェックを外す．
 
-version = '2024/4/18 4:43:35 PM'
+version = '2024/4/28 6:13:18 PM'
 
 import os
 languages = os.environ.get('LANG')
@@ -125,6 +125,9 @@ by_what_show_z_wx = (_(u'虹色'), _(u'白→黒'), _(u'黒→白'), _(u'白→�
     _(u'白→青+記号の大きさ')) # unicode
 paint_styles = ('rainbow', 'wb', 'bw', 'wR', 'wB', None) # str
 paint_styles_wx = (_(u'虹色'), _(u'白→黒'), _(u'黒→白'), _(u'白→赤'), _(u'白→青'), _(u'塗りなし')) # unicode
+
+pat_math = re.compile(r'(?<![a-zA-Z0-9_.\s])\s*([a-z0-9]+\s*\(|(?:pi|e)(?![a-zA-Z0-9_.(]))')
+pat_eq_plot = re.compile(r'(.+?)\s*,\s*([^,]+?)\s*=\s*\[\s*(.+?)\s*,\s*(.+?)\s*\]\s*/\s*(.+)')
 
 def get_file_from_google_drive(file_id):
     r = requests.get('https://drive.google.com/uc', params = {'export': 'download', 'id': file_id})
@@ -291,11 +294,12 @@ def data_from_file(file_name, columns = (1, 2), every = 1, skip = '#', delimiter
             file_name = os.path.join(os.path.dirname(file_name), zf.namelist()[0])
     if file_name.endswith(u'.csv'):
         columns1 = []
+        pat_cell = re.compile(r'[0-9]+\s*!\s*([a-zA-Z]+)\s*([0-9]+)')
         for i in columns:
-            i = re.sub(r'(?<![a-zA-Z0-9_.\s])\s*([a-z0-9]+\s*\(|(?:pi|e)(?![a-zA-Z0-9_.(]))', r'math.\1', i)
+            i = pat_math.sub(r'math.\1', i)
             s = ['']
             while True:
-                r = re.search(r'[0-9]+\s*!\s*([a-zA-Z]+)\s*([0-9]+)', i)
+                r = pat_cell.search(i)
                 if r is not None:
                     s[-1] += i[:r.start()] + '('
                     s.append([alphabet_to_number(r.group(1)) - 1, int(r.group(2)) - 1])
@@ -339,7 +343,7 @@ def data_from_file(file_name, columns = (1, 2), every = 1, skip = '#', delimiter
                                 columns1[i][j][1] += 1
                         else:
                             s += columns1[i][j]
-                    data[i].append(eval(s, param_dict))
+                    data[i].append(float(eval(s, param_dict)))
                     if data[i][-1] is None:
                         has_None = True
                 except:
@@ -351,11 +355,12 @@ def data_from_file(file_name, columns = (1, 2), every = 1, skip = '#', delimiter
                     break
     elif file_name.endswith(u'.xls') or file_name.endswith(u'.xlsx'):
         columns1 = []
+        pat_cell = re.compile(r'([0-9]+)\s*!\s*([a-zA-Z]+)\s*([0-9]+)')
         for i in columns:
-            i = re.sub(r'(?<![a-zA-Z0-9_.\s])\s*([a-z0-9]+\s*\(|(?:pi|e)(?![a-zA-Z0-9_.(]))', r'math.\1', i)
+            i = pat_math.sub(r'math.\1', i)
             s = ['']
             while True:
-                r = re.search(r'([0-9]+)\s*!\s*([a-zA-Z]+)\s*([0-9]+)', i)
+                r = pat_cell.search(i)
                 if r is not None:
                     s[-1] += i[:r.start()] + '('
                     s.append([int(r.group(1)) - 1, alphabet_to_number(r.group(2)) - 1, int(r.group(3)) - 1])
@@ -404,7 +409,7 @@ def data_from_file(file_name, columns = (1, 2), every = 1, skip = '#', delimiter
                                 columns1[i][j][2] += 1
                         else:
                             s += columns1[i][j]
-                    data[i].append(eval(s, param_dict))
+                    data[i].append(float(eval(s, param_dict)))
                     if data[i][-1] is None:
                         has_None = True
                 except:
@@ -417,14 +422,15 @@ def data_from_file(file_name, columns = (1, 2), every = 1, skip = '#', delimiter
                     break
     else:
         columns1 = []
+        pat_col = re.compile(r'\$([0-9]+)')
         for i in columns:
             if type(i) is int:
                 columns1.append(i - 1)
             else:
-                i = re.sub(r'(?<![a-zA-Z0-9_.\s])\s*([a-z0-9]+\s*\(|(?:pi|e)(?![a-zA-Z0-9_.(]))', r'math.\1', i)
+                i = pat_math.sub(r'math.\1', i)
                 s = ['']
                 while True:
-                    r = re.search(r'\$([0-9]+)', i)
+                    r = pat_col.search(i)
                     if r is not None:
                         s[-1] += i[:r.start()] + '('
                         s.append(int(r.group(1)) - 1)
@@ -467,7 +473,7 @@ def data_from_file(file_name, columns = (1, 2), every = 1, skip = '#', delimiter
                                     s += line[k]
                             else:
                                 s += k
-                        data[i].append(eval(s, param_dict))
+                        data[i].append(float(eval(s, param_dict)))
                     if data[i][-1] is None:
                         has_None = True
                 except:
@@ -481,6 +487,30 @@ def data_from_file(file_name, columns = (1, 2), every = 1, skip = '#', delimiter
         os.remove(file_name)
     if every != 1:
         data = [data[i][::every] for i in range(len(data))]
+    return np.array(data)
+
+def data_from_equation(equation, param_dict = None):
+    # equation = 'sqrt(2.2*x), x = [0.0, 1.0]/100'
+    if param_dict is None:
+        param_dict = {}
+    param_dict['math'] = globals()['math']
+    r = pat_eq_plot.search(equation)
+    eq = pat_math.sub(r'math.\1', r[1])
+    x = r[2]
+    x_val = param_dict[x] if x in param_dict else None
+    div = int(eval(pat_math.sub(r'math.\1', r[5]), param_dict))
+    x0 = float(eval(pat_math.sub(r'math.\1', r[3]), param_dict))
+    dx = (float(eval(pat_math.sub(r'math.\1', r[4]), param_dict)) - x0)/div
+    data = [[], []]
+    for i in range(div + 1):
+        v = x0 + dx*i
+        param_dict[x] = v
+        data[0].append(v)
+        data[1].append(float(eval(eq, param_dict)))
+    if x_val is None:
+        del param_dict[x]
+    else:
+        param_dict[x] = x_val
     return np.array(data)
 
 x_max = None
@@ -1010,42 +1040,48 @@ def plot(dict_lists, show = True):
                 xte = i[4], yte = i[5], line_width = i[6], fill = i[7], zorder = i[8])
     for i in dict_lists[1:]:
         try:
-            d = {'file_name': i['file_name'], 'columns': i['columns'], 'every': i['every']}
-            if 'err_columns' in i and i['err_columns'] is not None:
-                i['err_columns'] = list(i['err_columns'])
-                for j, k in enumerate(i['err_columns']):
-                    if type(k) is tuple:
-                        k = [l for l in sorted(set(k), key = k.index) if l is not None]
-                        if len(k) == 0:
-                            i['err_columns'][j] = None
-                        elif len(k) == 1:
-                            i['err_columns'][j] = k[0]
-                        elif i['err_columns'][j] != k:
-                            i['err_columns'][j] = k
-                        d['columns'] += tuple(k)
-                    elif k is not None:
-                        d['columns'] += (k,)
-            has_err = False if i['columns'] == d['columns'] else True
-            for j in ('skip', 'delimiter', 'terminator', 'param_dict'):
-                if j in dict_lists[0]:
-                    d[j] = dict_lists[0][j]
-            d = {'data': data_from_file(**d)}
-            if has_err:
-                d['err'] = []
-                e = len(i['columns'])
-                for j in i['err_columns']:
-                    if type(j) is tuple:
-                        d['err'].append([d['data'][e], d['data'][e + 1]])
-                        e += 2
-                    elif j is not None:
-                        d['err'].append(d['data'][e])
-                        e += 1
-                    else:
-                        d['err'].append(None)
-                d['data'] = d['data'][:len(i['columns'])]
-            for j in ('ranges', 'ticks', 'log_scale', 'fig_size', 'aspect', 'graph_edges', 'title', 'labels', 'grids'):
-                if j in dict_lists[0]:
-                    d[j] = dict_lists[0][j]
+            if 'file_name' in i:
+                d = {'file_name': i['file_name'], 'columns': i['columns'], 'every': i['every']}
+                if 'err_columns' in i and i['err_columns'] is not None:
+                    i['err_columns'] = list(i['err_columns'])
+                    for j, k in enumerate(i['err_columns']):
+                        if type(k) is tuple:
+                            k = [l for l in sorted(set(k), key = k.index) if l is not None]
+                            if len(k) == 0:
+                                i['err_columns'][j] = None
+                            elif len(k) == 1:
+                                i['err_columns'][j] = k[0]
+                            elif i['err_columns'][j] != k:
+                                i['err_columns'][j] = k
+                            d['columns'] += tuple(k)
+                        elif k is not None:
+                            d['columns'] += (k,)
+                has_err = False if i['columns'] == d['columns'] else True
+                for j in ('skip', 'delimiter', 'terminator', 'param_dict'):
+                    if j in dict_lists[0]:
+                        d[j] = dict_lists[0][j]
+                d = {'data': data_from_file(**d)}
+                if has_err:
+                    d['err'] = []
+                    e = len(i['columns'])
+                    for j in i['err_columns']:
+                        if type(j) is tuple:
+                            d['err'].append([d['data'][e], d['data'][e + 1]])
+                            e += 2
+                        elif j is not None:
+                            d['err'].append(d['data'][e])
+                            e += 1
+                        else:
+                            d['err'].append(None)
+                    d['data'] = d['data'][:len(i['columns'])]
+                for j in ('ranges', 'ticks', 'log_scale', 'fig_size', 'aspect', 'graph_edges', 'title', 'labels', 'grids'):
+                    if j in dict_lists[0]:
+                        d[j] = dict_lists[0][j]
+            else:
+                d = {'equation': i['equation']}
+                if 'param_dict' in dict_lists[0]:
+                    d['param_dict'] = dict_lists[0]['param_dict']
+                d = {'data': data_from_equation(**d)}
         except:
             print(sys.exc_info())
         if i['type'] == 'scatter':
@@ -3384,7 +3420,8 @@ class FrameMain(wx.Frame):
             print(sys.exc_info())
         n = 0
         for x in s[1:]:
-            if x['type'] == u'scatter' and 'file_name' in x and x['file_name'] is not None:
+            if x['type'] == u'scatter' and ('file_name' in x and x['file_name'] is not None or
+                    'equation' in x and x['equation'] is not None):
                 if n == n_scatter:
                     continue
                 try:
@@ -3395,7 +3432,10 @@ class FrameMain(wx.Frame):
                     self.filePickers_scatter[n].SetPath(
                         correct_file_name_in_unicode(os.path.join(dir_name, x['file_name'])))
                 except:
-                    print(sys.exc_info())
+                    try:
+                        self.filePickers_scatter[n].SetPath(x['equation'])
+                    except:
+                        print(sys.exc_info())
                 for i, j in ((self.textCtrls_scatter_column_x[n], 0), (self.textCtrls_scatter_column_y[n], 1),
                              (self.textCtrls_scatter_column_z[n], 2)):
                     try:
@@ -3491,7 +3531,7 @@ class FrameMain(wx.Frame):
                 except:
                     print(sys.exc_info())
                 try:
-                    if x['show_z_by'] is None:
+                    if 'show_z_by' not in x or x['show_z_by'] is None:
                         self.textCtrls_scatter_column_z[n].SetValue(u'')
                     else:
                         self.choices_show_z_by[n].SetSelection(by_what_show_z.index(x['show_z_by']))
@@ -3785,61 +3825,64 @@ class FrameMain(wx.Frame):
                 s = s[:-2] + u"},\n"
             s += "},\n"
             for n in range(n_scatter):
-                if self.filePickers_scatter[n].GetPath() == u'':
+                fn = self.filePickers_scatter[n].GetPath()
+                if fn == u'':
                     continue
                 s += u"{\n    'type': 'scatter',\n"
                 s += u"    'zorder': {},\n".format(self.spinCtrls_zorder_scatter[n].GetValue())
-                fn = correct_file_name_in_unicode(
-                    os.path.relpath(self.filePickers_scatter[n].GetPath(), start = os.path.dirname(path)))
-                s += u"    'file_name': '{}',\n".format(fn.replace("\\", r"\\").replace("'", r"\'"))
-                s += u"    'columns': ("
-                for i in (self.textCtrls_scatter_column_x[n].GetValue(),
-                          self.textCtrls_scatter_column_y[n].GetValue(),
-                          self.textCtrls_scatter_column_z[n].GetValue()): # unicode
-                    if i == u'':
-                        s += u"None, "
-                    elif fn.endswith(u'.csv') or fn.endswith(u'.xls') or fn.endswith(u'.xlsx'):
-                        s += u"'{}', ".format(i.strip(u"'"))
-                    else:
-                        try:
-                            s += u"{}, ".format(int(i))
-                        except:
+                file_plot = True if pat_eq_plot.search(fn) is None else False
+                if file_plot:
+                    fn = correct_file_name_in_unicode(os.path.relpath(fn, start = os.path.dirname(path)))
+                    s += u"    'file_name': '{}',\n".format(fn.replace("\\", r"\\").replace("'", r"\'"))
+                    s += u"    'columns': ("
+                    for i in (self.textCtrls_scatter_column_x[n].GetValue(),
+                            self.textCtrls_scatter_column_y[n].GetValue(),
+                            self.textCtrls_scatter_column_z[n].GetValue()): # unicode
+                        if i == u'':
+                            s += u"None, "
+                        elif fn.endswith(u'.csv') or fn.endswith(u'.xls') or fn.endswith(u'.xlsx'):
                             s += u"'{}', ".format(i.strip(u"'"))
-                s = s[:-8 if s.endswith(u', None, ') else -2] + u"),\n"
-                s += u"    'err_columns': ("
-                for v in ((self.textCtrls_scatter_err_column_xn[n].GetValue(),
-                           self.textCtrls_scatter_err_column_xp[n].GetValue()),
-                          (self.textCtrls_scatter_err_column_yn[n].GetValue(),
-                           self.textCtrls_scatter_err_column_yp[n].GetValue())): # unicode
-                    v = [i for i in sorted(set(v), key = v.index) if i != u'']
-                    if len(v) == 0:
-                        s += u"None, "
-                    elif len(v) == 1:
-                        if fn.endswith(u'.csv') or fn.endswith(u'.xls') or fn.endswith(u'.xlsx'):
-                            s += u"'{}', ".format(v[0].strip(u"'"))
                         else:
                             try:
-                                s += u"{}, ".format(int(v[0]))
+                                s += u"{}, ".format(int(i))
                             except:
+                                s += u"'{}', ".format(i.strip(u"'"))
+                    s = s[:-8 if s.endswith(u', None, ') else -2] + u"),\n"
+                    s += u"    'err_columns': ("
+                    for v in ((self.textCtrls_scatter_err_column_xn[n].GetValue(),
+                            self.textCtrls_scatter_err_column_xp[n].GetValue()),
+                            (self.textCtrls_scatter_err_column_yn[n].GetValue(),
+                            self.textCtrls_scatter_err_column_yp[n].GetValue())): # unicode
+                        v = [i for i in sorted(set(v), key = v.index) if i != u'']
+                        if len(v) == 0:
+                            s += u"None, "
+                        elif len(v) == 1:
+                            if fn.endswith(u'.csv') or fn.endswith(u'.xls') or fn.endswith(u'.xlsx'):
                                 s += u"'{}', ".format(v[0].strip(u"'"))
-                    else:
-                        if fn.endswith(u'.csv') or fn.endswith(u'.xls') or fn.endswith(u'.xlsx'):
-                            s += u"('{}', '{}'), ".format(v[0].strip(u"'"), v[1])
+                            else:
+                                try:
+                                    s += u"{}, ".format(int(v[0]))
+                                except:
+                                    s += u"'{}', ".format(v[0].strip(u"'"))
                         else:
-                            try:
-                                s += u"({}, ".format(int(v[0]))
-                            except:
-                                s += u"('{}', ".format(v[0].strip(u"'"))
-                            try:
-                                s += u"{}), ".format(int(v[1]))
-                            except:
-                                s += u"'{}'), ".format(v[1].strip(u"'"))
-                s = s[:-2] + u"),\n"
-                fn = None
-                try:
-                    s += u"    'every': {},\n".format(int(self.textCtrls_scatter_every[n].GetValue()))
-                except:
-                    s += u"    'every': 1,\n"
+                            if fn.endswith(u'.csv') or fn.endswith(u'.xls') or fn.endswith(u'.xlsx'):
+                                s += u"('{}', '{}'), ".format(v[0].strip(u"'"), v[1])
+                            else:
+                                try:
+                                    s += u"({}, ".format(int(v[0]))
+                                except:
+                                    s += u"('{}', ".format(v[0].strip(u"'"))
+                                try:
+                                    s += u"{}), ".format(int(v[1]))
+                                except:
+                                    s += u"'{}'), ".format(v[1].strip(u"'"))
+                    s = s[:-2] + u"),\n"
+                    try:
+                        s += u"    'every': {},\n".format(int(self.textCtrls_scatter_every[n].GetValue()))
+                    except:
+                        s += u"    'every': 1,\n"
+                else: # not file_plot
+                    s += u"    'equation': '{}',\n".format(fn)
                 v = self.choices_scatter_marker[n].GetSelection()
                 if v == len(markers) - 1:
                     s += u"    'marker': None,\n"
@@ -3863,25 +3906,27 @@ class FrameMain(wx.Frame):
                     s += u"    'line_style': '{}',\n".format(line_styles[v])
                 v = self.colourPickers_scatter_line[n].GetColour()
                 s += u"    'line_color': ({:g}, {:g}, {:g}),\n".format(v.Red()/255.0, v.Green()/255.0, v.Blue()/255.0)
-                if self.textCtrls_scatter_column_z[n].GetValue() == u'':
-                    s += u"    'show_z_by': None,\n"
-                else:
-                    s += u"    'show_z_by': '{}',\n".format(by_what_show_z[self.choices_show_z_by[n].GetSelection()])
-                try:
-                    s += u"    'marker_size_ratio': {:g},\n".format(float(self.textCtrls_scatter_marker_size_ratio[n].GetValue()))
-                except:
-                    s += u"    'marker_size_ratio': None,\n"
+                if file_plot:
+                    if self.textCtrls_scatter_column_z[n].GetValue() == u'':
+                        s += u"    'show_z_by': None,\n"
+                    else:
+                        s += u"    'show_z_by': '{}',\n".format(by_what_show_z[self.choices_show_z_by[n].GetSelection()])
+                    try:
+                        s += u"    'marker_size_ratio': {:g},\n".format(float(self.textCtrls_scatter_marker_size_ratio[n].GetValue()))
+                    except:
+                        s += u"    'marker_size_ratio': None,\n"
                 v = self.textCtrls_scatter_label[n].GetValue() # unicode
                 if v == u'':
                     s += u"    'label_in_legend': None,\n"
                 else:
                     s += u"    'label_in_legend': '{}',\n".format(v.replace("\\", r"\\").replace("'", r"\'"))
                 s += u"},\n"
-            if self.filePicker_vector.GetPath() != u'':
+            fn = self.filePicker_vector.GetPath()
+            if fn != u'':
                 s += u"{\n    'type': 'vector',\n"
                 s += u"    'zorder': {},\n".format(self.spinCtrl_zorder_vector.GetValue())
                 fn = correct_file_name_in_unicode(
-                    os.path.relpath(self.filePicker_vector.GetPath(), start = os.path.dirname(path)))
+                    os.path.relpath(fn, start = os.path.dirname(path)))
                 s += u"    'file_name': '{}',\n".format(fn.replace("\\", r"\\").replace("'", r"\'"))
                 s += u"    'columns': ("
                 for i in (self.textCtrl_vector_column_x.GetValue(),
@@ -3898,7 +3943,6 @@ class FrameMain(wx.Frame):
                         except:
                             s += u"'{}', ".format(i.strip(u"'"))
                 s = s[:-2] + u"),\n"
-                fn = None
                 try:
                     s += u"    'every': {},\n".format(int(self.textCtrl_vector_every.GetValue()))
                 except:
@@ -3925,11 +3969,12 @@ class FrameMain(wx.Frame):
                 except:
                     s += u"    'legend': None,\n"
                 s += u"},\n"
-            if self.filePicker_contour.GetPath() != u'':
+            fn = self.filePicker_contour.GetPath()
+            if fn != u'':
                 s += u"{\n    'type': 'contour',\n"
                 s += u"    'zorder': {},\n".format(self.spinCtrl_zorder_contour.GetValue())
                 fn = correct_file_name_in_unicode(
-                    os.path.relpath(self.filePicker_contour.GetPath(), start = os.path.dirname(path)))
+                    os.path.relpath(fn, start = os.path.dirname(path)))
                 s += u"    'file_name': '{}',\n".format(fn.replace("\\", r"\\").replace("'", r"\'"))
                 s += u"    'grid_pattern': " + str(self.checkBox_contour_grid_pattern.GetValue()) + u",\n"
                 s += u"    'show_triangle': " + str(self.checkBox_contour_show_triangle.GetValue()) + u",\n"
@@ -3947,7 +3992,6 @@ class FrameMain(wx.Frame):
                         except:
                             s += u"'{}', ".format(i.strip(u"'"))
                 s = s[:-2] + u"),\n"
-                fn = None
                 try:
                     s += u"    'every': {},\n".format(int(self.textCtrl_contour_every.GetValue()))
                 except:
