@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 # matplotlibwx.py
 # by Yukiharu Iwamoto
-# 2024/4/28 8:32:55 PM
+# 2024/5/1 10:36:27 AM
 
 # Macの場合，文字入力後に引用符が勝手に変わったりしてうまく動かない．
 # 「システム環境設定」→「キーボード」→「ユーザー辞書」→「スマート引用符とスマートダッシュを使用」のチェックを外す．
 
-version = '2024/4/28 6:13:18 PM'
+version = '2024/5/1 10:36:27 AM'
 
 import os
 languages = os.environ.get('LANG')
@@ -1074,14 +1074,14 @@ def plot(dict_lists, show = True):
                         else:
                             d['err'].append(None)
                     d['data'] = d['data'][:len(i['columns'])]
-                for j in ('ranges', 'ticks', 'log_scale', 'fig_size', 'aspect', 'graph_edges', 'title', 'labels', 'grids'):
-                    if j in dict_lists[0]:
-                        d[j] = dict_lists[0][j]
             else:
                 d = {'equation': i['equation']}
                 if 'param_dict' in dict_lists[0]:
                     d['param_dict'] = dict_lists[0]['param_dict']
                 d = {'data': data_from_equation(**d)}
+            for j in ('ranges', 'ticks', 'log_scale', 'fig_size', 'aspect', 'graph_edges', 'title', 'labels', 'grids'):
+                if j in dict_lists[0]:
+                    d[j] = dict_lists[0][j]
         except:
             print(sys.exc_info())
         if i['type'] == 'scatter':
