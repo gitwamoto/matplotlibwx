@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 # matplotlibwx.py
 # by Yukiharu Iwamoto
-# 2024/5/1 10:36:27 AM
+# 2024/5/30 7:13:03 PM
 
 # Macの場合，文字入力後に引用符が勝手に変わったりしてうまく動かない．
 # 「システム環境設定」→「キーボード」→「ユーザー辞書」→「スマート引用符とスマートダッシュを使用」のチェックを外す．
 
-version = '2024/5/1 10:36:27 AM'
+version = '2024/5/30 7:13:03 PM'
 
 import os
 languages = os.environ.get('LANG')
@@ -126,8 +126,9 @@ by_what_show_z_wx = (_(u'虹色'), _(u'白→黒'), _(u'黒→白'), _(u'白→�
 paint_styles = ('rainbow', 'wb', 'bw', 'wR', 'wB', None) # str
 paint_styles_wx = (_(u'虹色'), _(u'白→黒'), _(u'黒→白'), _(u'白→赤'), _(u'白→青'), _(u'塗りなし')) # unicode
 
-pat_math = re.compile(r'(?<![a-zA-Z0-9_.\s])\s*([a-z0-9]+\s*\(|(?:pi|e)(?![a-zA-Z0-9_.(]))')
-pat_eq_plot = re.compile(r'(.+?)\s*,\s*([^,]+?)\s*=\s*\[\s*(.+?)\s*,\s*(.+?)\s*\]\s*/\s*(.+)')
+pat_math = re.compile(r'(?<![a-zA-Z0-9_.\s])\s*((?!abs\s*\()[a-z0-9]+\s*\(|(?:pi|e)(?![a-zA-Z0-9_.(]))')
+pat_eq_plot = re.compile(r'(?:\s+|)(.+?)\s*,\s*([^,=]+?)\s*=\s*\[\s*(.+?)\s*,\s*(.+?)\s*\]\s*/\s*(.+?)\s*' +
+                                       '(?:,\s*([^,=]+?)\s*=\s*\[\s*(.+?)\s*,\s*(.+?)\s*\]\s*/\s*(.+?)\s*)?$')
 
 def get_file_from_google_drive(file_id):
     r = requests.get('https://drive.google.com/uc', params = {'export': 'download', 'id': file_id})
@@ -490,27 +491,69 @@ def data_from_file(file_name, columns = (1, 2), every = 1, skip = '#', delimiter
     return np.array(data)
 
 def data_from_equation(equation, param_dict = None):
-    # equation = 'sqrt(2.2*x), x = [0.0, 1.0]/100'
+    # examples of equation
+    #  'sqrt(2.2*x), x = [0.0, 1.0]/100'
+    #       1              2    3      4      5
+    #    -> 'sqrt(2.2*x)', 'x', '0.0', '1.0', '100'
+    #  'sqrt(x)*y**2, x = [-1.0, 1.0]/100, y = [-1.0, 1.0]/100'
+    #       1               2    3       4      5      6    7       8      9
+    #    -> 'sqrt(x)*y**2', 'x', '-1.0', '1.0', '100', 'y', '-1.0', '1.0', '100'
+    #  '[cos(2.0*x), sin(y)], x = [-1.0, 1.0]/100, y = [-1.00, 1.0]/100'
+    #       1                       2    3       4      5      6    7       8      9
+    #    -> '[cos(2.0*x), sin(y)]', 'x', '-1.0', '1.0', '100', 'y', '-1.0', '1.0', '100']
     if param_dict is None:
         param_dict = {}
     param_dict['math'] = globals()['math']
-    r = pat_eq_plot.search(equation)
+    r = pat_eq_plot.match(equation)
     eq = pat_math.sub(r'math.\1', r[1])
+
     x = r[2]
     x_val = param_dict[x] if x in param_dict else None
-    div = int(eval(pat_math.sub(r'math.\1', r[5]), param_dict))
     x0 = float(eval(pat_math.sub(r'math.\1', r[3]), param_dict))
-    dx = (float(eval(pat_math.sub(r'math.\1', r[4]), param_dict)) - x0)/div
-    data = [[], []]
-    for i in range(div + 1):
-        v = x0 + dx*i
-        param_dict[x] = v
-        data[0].append(v)
-        data[1].append(float(eval(eq, param_dict)))
+    div_x = int(eval(pat_math.sub(r'math.\1', r[5]), param_dict))
+    dx = (float(eval(pat_math.sub(r'math.\1', r[4]), param_dict)) - x0)/div_x
+    data = [[], [], [], []]
+    if r[6] is None:
+        for i in range(div_x + 1):
+            vx = x0 + dx*i
+            param_dict[x] = vx
+            data[0].append(vx)
+            v = eval(eq, param_dict)
+            if isinstance(v, list):
+                data[1].append(float(v[0]))
+                data[2].append(float(v[1]))
+            else:
+                data[1].append(float(v))
+    else:
+        y = r[6]
+        y_val = param_dict[y] if y in param_dict else None
+        y0 = float(eval(pat_math.sub(r'math.\1', r[7]), param_dict))
+        div_y = int(eval(pat_math.sub(r'math.\1', r[9]), param_dict))
+        dy = (float(eval(pat_math.sub(r'math.\1', r[8]), param_dict)) - y0)/div_y
+        for j in range(div_y + 1):
+            vy = y0 + dy*j
+            param_dict[y] = vy
+            for i in range(div_x + 1):
+                vx = x0 + dx*i
+                param_dict[x] = vx
+                data[0].append(vx)
+                data[1].append(vy)
+                v = eval(eq, param_dict)
+                if isinstance(v, list):
+                    data[2].append(float(v[0]))
+                    data[3].append(float(v[1]))
+                else:
+                    data[2].append(float(v))
+        if y_val is None:
+            del param_dict[y]
+        else:
+            param_dict[y] = y_val
     if x_val is None:
         del param_dict[x]
     else:
         param_dict[x] = x_val
+    while len(data[-1]) == 0:
+        del data[-1]
     return np.array(data)
 
 x_max = None
@@ -3222,7 +3265,7 @@ class FrameMain(wx.Frame):
     def OnFileChanged(self, event):
         p = correct_file_name_in_unicode(event.GetEventObject().GetPath()) # unicode
         event.GetEventObject().SetPath(p)
-        if p == u'':
+        if p == u'' or pat_eq_plot.match(p):
             if event.GetEventObject().GetWindowStyle() & wx.FLP_FILE_MUST_EXIST:
                 event.GetEventObject().GetTextCtrl().SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_WINDOW))
         elif os.path.isfile(p):
@@ -3830,7 +3873,7 @@ class FrameMain(wx.Frame):
                     continue
                 s += u"{\n    'type': 'scatter',\n"
                 s += u"    'zorder': {},\n".format(self.spinCtrls_zorder_scatter[n].GetValue())
-                file_plot = True if pat_eq_plot.search(fn) is None else False
+                file_plot = True if pat_eq_plot.match(fn) is None else False
                 if file_plot:
                     fn = correct_file_name_in_unicode(os.path.relpath(fn, start = os.path.dirname(path)))
                     s += u"    'file_name': '{}',\n".format(fn.replace("\\", r"\\").replace("'", r"\'"))
@@ -3925,28 +3968,32 @@ class FrameMain(wx.Frame):
             if fn != u'':
                 s += u"{\n    'type': 'vector',\n"
                 s += u"    'zorder': {},\n".format(self.spinCtrl_zorder_vector.GetValue())
-                fn = correct_file_name_in_unicode(
-                    os.path.relpath(fn, start = os.path.dirname(path)))
-                s += u"    'file_name': '{}',\n".format(fn.replace("\\", r"\\").replace("'", r"\'"))
-                s += u"    'columns': ("
-                for i in (self.textCtrl_vector_column_x.GetValue(),
-                          self.textCtrl_vector_column_y.GetValue(),
-                          self.textCtrl_vector_column_u.GetValue(),
-                          self.textCtrl_vector_column_v.GetValue()): # unicode
-                    if i == u'':
-                        s += u"None, "
-                    elif fn.endswith(u'.csv') or fn.endswith(u'.xls') or fn.endswith(u'.xlsx'):
-                        s += u"'{}', ".format(i.strip(u"'"))
-                    else:
-                        try:
-                            s += u"{}, ".format(int(i))
-                        except:
+                file_plot = True if pat_eq_plot.match(fn) is None else False
+                if file_plot:
+                    fn = correct_file_name_in_unicode(
+                        os.path.relpath(fn, start = os.path.dirname(path)))
+                    s += u"    'file_name': '{}',\n".format(fn.replace("\\", r"\\").replace("'", r"\'"))
+                    s += u"    'columns': ("
+                    for i in (self.textCtrl_vector_column_x.GetValue(),
+                            self.textCtrl_vector_column_y.GetValue(),
+                            self.textCtrl_vector_column_u.GetValue(),
+                            self.textCtrl_vector_column_v.GetValue()): # unicode
+                        if i == u'':
+                            s += u"None, "
+                        elif fn.endswith(u'.csv') or fn.endswith(u'.xls') or fn.endswith(u'.xlsx'):
                             s += u"'{}', ".format(i.strip(u"'"))
-                s = s[:-2] + u"),\n"
-                try:
-                    s += u"    'every': {},\n".format(int(self.textCtrl_vector_every.GetValue()))
-                except:
-                    s += u"    'every': 1,\n"
+                        else:
+                            try:
+                                s += u"{}, ".format(int(i))
+                            except:
+                                s += u"'{}', ".format(i.strip(u"'"))
+                    s = s[:-2] + u"),\n"
+                    try:
+                        s += u"    'every': {},\n".format(int(self.textCtrl_vector_every.GetValue()))
+                    except:
+                        s += u"    'every': 1,\n"
+                else: # not file_plot
+                    s += u"    'equation': '{}',\n".format(fn)
                 v = self.choice_vector_color.GetSelection()
                 if v == 0:
                     v = self.colourPicker_vector.GetColour()
@@ -3973,29 +4020,34 @@ class FrameMain(wx.Frame):
             if fn != u'':
                 s += u"{\n    'type': 'contour',\n"
                 s += u"    'zorder': {},\n".format(self.spinCtrl_zorder_contour.GetValue())
-                fn = correct_file_name_in_unicode(
-                    os.path.relpath(fn, start = os.path.dirname(path)))
-                s += u"    'file_name': '{}',\n".format(fn.replace("\\", r"\\").replace("'", r"\'"))
+                file_plot = True if pat_eq_plot.match(fn) is None else False
+                if file_plot:
+                    fn = correct_file_name_in_unicode(
+                        os.path.relpath(fn, start = os.path.dirname(path)))
+                    s += u"    'file_name': '{}',\n".format(fn.replace("\\", r"\\").replace("'", r"\'"))
+                else: # not file_plot
+                    s += u"    'equation': '{}',\n".format(fn)
                 s += u"    'grid_pattern': " + str(self.checkBox_contour_grid_pattern.GetValue()) + u",\n"
                 s += u"    'show_triangle': " + str(self.checkBox_contour_show_triangle.GetValue()) + u",\n"
-                s += u"    'columns': ("
-                for i in (self.textCtrl_contour_column_x.GetValue(),
-                          self.textCtrl_contour_column_y.GetValue(),
-                          self.textCtrl_contour_column_z.GetValue()): # unicode
-                    if i == u'':
-                        s += u"None, "
-                    elif fn.endswith(u'.csv') or fn.endswith(u'.xls') or fn.endswith(u'.xlsx'):
-                        s += u"'{}', ".format(i.strip(u"'"))
-                    else:
-                        try:
-                            s += u"{}, ".format(int(i))
-                        except:
+                if file_plot:
+                    s += u"    'columns': ("
+                    for i in (self.textCtrl_contour_column_x.GetValue(),
+                            self.textCtrl_contour_column_y.GetValue(),
+                            self.textCtrl_contour_column_z.GetValue()): # unicode
+                        if i == u'':
+                            s += u"None, "
+                        elif fn.endswith(u'.csv') or fn.endswith(u'.xls') or fn.endswith(u'.xlsx'):
                             s += u"'{}', ".format(i.strip(u"'"))
-                s = s[:-2] + u"),\n"
-                try:
-                    s += u"    'every': {},\n".format(int(self.textCtrl_contour_every.GetValue()))
-                except:
-                    s += u"    'every': 1,\n"
+                        else:
+                            try:
+                                s += u"{}, ".format(int(i))
+                            except:
+                                s += u"'{}', ".format(i.strip(u"'"))
+                    s = s[:-2] + u"),\n"
+                    try:
+                        s += u"    'every': {},\n".format(int(self.textCtrl_contour_every.GetValue()))
+                    except:
+                        s += u"    'every': 1,\n"
                 v = self.choice_contour_paint.GetSelection()
                 if v == len(paint_styles) - 1:
                     s += u"    'paint': None,\n"
