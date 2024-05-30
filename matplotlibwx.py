@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 # matplotlibwx.py
 # by Yukiharu Iwamoto
-# 2024/5/30 7:13:03 PM
+# 2024/5/30 7:20:57 PM
 
 # Macの場合，文字入力後に引用符が勝手に変わったりしてうまく動かない．
 # 「システム環境設定」→「キーボード」→「ユーザー辞書」→「スマート引用符とスマートダッシュを使用」のチェックを外す．
 
-version = '2024/5/30 7:13:03 PM'
+version = '2024/5/30 7:20:57 PM'
 
 import os
 languages = os.environ.get('LANG')
@@ -3949,15 +3949,14 @@ class FrameMain(wx.Frame):
                     s += u"    'line_style': '{}',\n".format(line_styles[v])
                 v = self.colourPickers_scatter_line[n].GetColour()
                 s += u"    'line_color': ({:g}, {:g}, {:g}),\n".format(v.Red()/255.0, v.Green()/255.0, v.Blue()/255.0)
-                if file_plot:
-                    if self.textCtrls_scatter_column_z[n].GetValue() == u'':
-                        s += u"    'show_z_by': None,\n"
-                    else:
-                        s += u"    'show_z_by': '{}',\n".format(by_what_show_z[self.choices_show_z_by[n].GetSelection()])
-                    try:
-                        s += u"    'marker_size_ratio': {:g},\n".format(float(self.textCtrls_scatter_marker_size_ratio[n].GetValue()))
-                    except:
-                        s += u"    'marker_size_ratio': None,\n"
+                if self.textCtrls_scatter_column_z[n].GetValue() == u'':
+                    s += u"    'show_z_by': None,\n"
+                else:
+                    s += u"    'show_z_by': '{}',\n".format(by_what_show_z[self.choices_show_z_by[n].GetSelection()])
+                try:
+                    s += u"    'marker_size_ratio': {:g},\n".format(float(self.textCtrls_scatter_marker_size_ratio[n].GetValue()))
+                except:
+                    s += u"    'marker_size_ratio': None,\n"
                 v = self.textCtrls_scatter_label[n].GetValue() # unicode
                 if v == u'':
                     s += u"    'label_in_legend': None,\n"
