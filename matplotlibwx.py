@@ -510,13 +510,14 @@ def data_from_equation(equation, param_dict = None):
     x = r[2]
     x_val = param_dict[x] if x in param_dict else None
     x0 = float(eval(pat_math.sub(r'math.\1', r[3]), param_dict))
+    dx = float(eval(pat_math.sub(r'math.\1', r[4]), param_dict))
     div_x = int(eval(pat_math.sub(r'math.\1', r[6]), param_dict))
     if r[5] == '/':
         log_x = False
-        dx = (float(eval(pat_math.sub(r'math.\1', r[4]), param_dict)) - x0)/div_x
+        dx = (dx - x0)/div_x
     else: # Log scale
         log_x = True
-        dx = (float(eval(pat_math.sub(r'math.\1', r[4]), param_dict))/x0)**(1.0/div_x)
+        dx = (dx/x0)**(1.0/div_x)
     data = [[], [], [], []]
     y = r[7]
     if y is None:
@@ -533,17 +534,17 @@ def data_from_equation(equation, param_dict = None):
     else: # y is not None
         y_val = param_dict[y] if y in param_dict else None
         y0 = float(eval(pat_math.sub(r'math.\1', r[8]), param_dict))
+        dy = float(eval(pat_math.sub(r'math.\1', r[9]), param_dict))
         div_y = int(eval(pat_math.sub(r'math.\1', r[11]), param_dict))
         if r[10] == '/':
             log_y = False
-            dy = (float(eval(pat_math.sub(r'math.\1', r[9]), param_dict)) - y0)/div_y
+            dy = (dy - y0)/div_y
         else: # Log scale
             log_y = True
-            dy = (float(eval(pat_math.sub(r'math.\1', r[9]), param_dict))/y0)**(1.0/div_y)
+            dy = (dy/y0)**(1.0/div_y)
         for j in range(div_y + 1):
-            if y is not None:
-                vy = y0*dy**j if log_y else y0 + dy*j
-                param_dict[y] = vy
+            vy = y0*dy**j if log_y else y0 + dy*j
+            param_dict[y] = vy
             for i in range(div_x + 1):
                 vx = x0*dx**i if log_x else x0 + dx*i
                 param_dict[x] = vx
