@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 # matplotlibwx.py
 # by Yukiharu Iwamoto
-# 2024/6/6 1:27:34 PM
+# 2024/6/6 10:52:50 PM
 
 # Macの場合，文字入力後に引用符が勝手に変わったりしてうまく動かない．
 # 「システム環境設定」→「キーボード」→「ユーザー辞書」→「スマート引用符とスマートダッシュを使用」のチェックを外す．
 
-version = '2024/6/6 1:27:34 PM'
+version = '2024/6/6 10:52:50 PM'
 
 import os
 languages = os.environ.get('LANG')
@@ -127,8 +127,8 @@ paint_styles = ('rainbow', 'wb', 'bw', 'wR', 'wB', None) # str
 paint_styles_wx = (_(u'虹色'), _(u'白→黒'), _(u'黒→白'), _(u'白→赤'), _(u'白→青'), _(u'塗りなし')) # unicode
 
 pat_math = re.compile(r'(?<![a-zA-Z0-9_.\s])\s*((?!abs\s*\()[a-z0-9]+\s*\(|(?:pi|e)(?![a-zA-Z0-9_.(]))')
-pat_eq_plot = re.compile(r'(?:\s+|)(.+?)\s*,\s*([^,=]+?)\s*=\s*\[\s*(.+?)\s*,\s*(.+?)\s*\]\s*/\s*(.+?)\s*' +
-                                      r'(?:,\s*([^,=]+?)\s*=\s*\[\s*(.+?)\s*,\s*(.+?)\s*\]\s*/\s*(.+?)\s*)?$')
+pat_eq_plot = re.compile(r'(?:\s+|)(.+?)\s*,\s*([^,=]+?)\s*=\s*\[\s*(.+?)\s*,\s*(.+?)\s*\]\s*(L?/)\s*(.+?)\s*' +
+                                      r'(?:,\s*([^,=]+?)\s*=\s*\[\s*(.+?)\s*,\s*(.+?)\s*\]\s*(L?/)\s*(.+?)\s*)?$')
 
 def get_file_from_google_drive(file_id):
     r = requests.get('https://drive.google.com/uc', params = {'export': 'download', 'id': file_id})
@@ -493,14 +493,14 @@ def data_from_file(file_name, columns = (1, 2), every = 1, skip = '#', delimiter
 def data_from_equation(equation, param_dict = None):
     # examples of equation
     #  'sqrt(2.2*x), x = [0.0, 1.0]/100'
-    #       1              2    3      4      5
-    #    -> 'sqrt(2.2*x)', 'x', '0.0', '1.0', '100'
+    #       1              2    3      4      5    6
+    #    -> 'sqrt(2.2*x)', 'x', '0.0', '1.0', '/', '100'
     #  'sqrt(x)*y**2, x = [-1.0, 1.0]/100, y = [-1.0, 1.0]/100'
-    #       1               2    3       4      5      6    7       8      9
-    #    -> 'sqrt(x)*y**2', 'x', '-1.0', '1.0', '100', 'y', '-1.0', '1.0', '100'
+    #       1               2    3       4      5    6      7    8       9      10   11
+    #    -> 'sqrt(x)*y**2', 'x', '-1.0', '1.0', '/', '100', 'y', '-1.0', '1.0', '/', '100'
     #  '[cos(2.0*x), sin(y)], x = [-1.0, 1.0]/100, y = [-1.00, 1.0]/100'
-    #       1                       2    3       4      5      6    7       8      9
-    #    -> '[cos(2.0*x), sin(y)]', 'x', '-1.0', '1.0', '100', 'y', '-1.0', '1.0', '100']
+    #       1                       2    3       4      5    6      7    8       9      10   11
+    #    -> '[cos(2.0*x), sin(y)]', 'x', '-1.0', '1.0', '/', '100', 'y', '-1.0', '1.0', '/', '100']
     if param_dict is None:
         param_dict = {}
     param_dict['math'] = globals()['math']
@@ -510,12 +510,18 @@ def data_from_equation(equation, param_dict = None):
     x = r[2]
     x_val = param_dict[x] if x in param_dict else None
     x0 = float(eval(pat_math.sub(r'math.\1', r[3]), param_dict))
-    div_x = int(eval(pat_math.sub(r'math.\1', r[5]), param_dict))
-    dx = (float(eval(pat_math.sub(r'math.\1', r[4]), param_dict)) - x0)/div_x
+    div_x = int(eval(pat_math.sub(r'math.\1', r[6]), param_dict))
+    if r[5] == '/':
+        log_x = False
+        dx = (float(eval(pat_math.sub(r'math.\1', r[4]), param_dict)) - x0)/div_x
+    else: # Log scale
+        log_x = True
+        dx = (float(eval(pat_math.sub(r'math.\1', r[4]), param_dict))/x0)**(1.0/div_x)
     data = [[], [], [], []]
-    if r[6] is None:
+    y = r[7]
+    if y is None:
         for i in range(div_x + 1):
-            vx = x0 + dx*i
+            vx = x0*dx**i if log_x else x0 + dx*i
             param_dict[x] = vx
             data[0].append(vx)
             v = eval(eq, param_dict)
@@ -524,17 +530,22 @@ def data_from_equation(equation, param_dict = None):
                 data[2].append(float(v[1]))
             else:
                 data[1].append(float(v))
-    else:
-        y = r[6]
+    else: # y is not None
         y_val = param_dict[y] if y in param_dict else None
-        y0 = float(eval(pat_math.sub(r'math.\1', r[7]), param_dict))
-        div_y = int(eval(pat_math.sub(r'math.\1', r[9]), param_dict))
-        dy = (float(eval(pat_math.sub(r'math.\1', r[8]), param_dict)) - y0)/div_y
+        y0 = float(eval(pat_math.sub(r'math.\1', r[8]), param_dict))
+        div_y = int(eval(pat_math.sub(r'math.\1', r[11]), param_dict))
+        if r[10] == '/':
+            log_y = False
+            dy = (float(eval(pat_math.sub(r'math.\1', r[9]), param_dict)) - y0)/div_y
+        else: # Log scale
+            log_y = True
+            dy = (float(eval(pat_math.sub(r'math.\1', r[9]), param_dict))/y0)**(1.0/div_y)
         for j in range(div_y + 1):
-            vy = y0 + dy*j
-            param_dict[y] = vy
+            if y is not None:
+                vy = y0*dy**j if log_y else y0 + dy*j
+                param_dict[y] = vy
             for i in range(div_x + 1):
-                vx = x0 + dx*i
+                vx = x0*dx**i if log_x else x0 + dx*i
                 param_dict[x] = vx
                 data[0].append(vx)
                 data[1].append(vy)
