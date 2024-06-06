@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 # matplotlibwx.py
 # by Yukiharu Iwamoto
-# 2024/5/30 7:20:57 PM
+# 2024/6/6 1:27:34 PM
 
 # Macの場合，文字入力後に引用符が勝手に変わったりしてうまく動かない．
 # 「システム環境設定」→「キーボード」→「ユーザー辞書」→「スマート引用符とスマートダッシュを使用」のチェックを外す．
 
-version = '2024/5/30 7:20:57 PM'
+version = '2024/6/6 1:27:34 PM'
 
 import os
 languages = os.environ.get('LANG')
@@ -128,7 +128,7 @@ paint_styles_wx = (_(u'虹色'), _(u'白→黒'), _(u'黒→白'), _(u'白→赤
 
 pat_math = re.compile(r'(?<![a-zA-Z0-9_.\s])\s*((?!abs\s*\()[a-z0-9]+\s*\(|(?:pi|e)(?![a-zA-Z0-9_.(]))')
 pat_eq_plot = re.compile(r'(?:\s+|)(.+?)\s*,\s*([^,=]+?)\s*=\s*\[\s*(.+?)\s*,\s*(.+?)\s*\]\s*/\s*(.+?)\s*' +
-                                       '(?:,\s*([^,=]+?)\s*=\s*\[\s*(.+?)\s*,\s*(.+?)\s*\]\s*/\s*(.+?)\s*)?$')
+                                      r'(?:,\s*([^,=]+?)\s*=\s*\[\s*(.+?)\s*,\s*(.+?)\s*\]\s*/\s*(.+?)\s*)?$')
 
 def get_file_from_google_drive(file_id):
     r = requests.get('https://drive.google.com/uc', params = {'export': 'download', 'id': file_id})
@@ -354,7 +354,7 @@ def data_from_file(file_name, columns = (1, 2), every = 1, skip = '#', delimiter
                     del data[i][-1]
                 if stop:
                     break
-    elif file_name.endswith(u'.xls') or file_name.endswith(u'.xlsx'):
+    elif file_name.endswith(u'.xls') or file_name.endswith(u'.xlsx') or file_name.endswith(u'.xlsm'):
         columns1 = []
         pat_cell = re.compile(r'([0-9]+)\s*!\s*([a-zA-Z]+)\s*([0-9]+)')
         for i in columns:
