@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 # matplotlibwx.py
 # by Yukiharu Iwamoto
-# 2024/6/6 10:56:11 PM
+# 2024/6/10 9:50:52 AM
 
 # Macの場合，文字入力後に引用符が勝手に変わったりしてうまく動かない．
 # 「システム環境設定」→「キーボード」→「ユーザー辞書」→「スマート引用符とスマートダッシュを使用」のチェックを外す．
 
-version = '2024/6/6 10:56:11 PM'
+version = '2024/6/10 9:50:52 AM'
 
 import os
 languages = os.environ.get('LANG')
@@ -3276,11 +3276,10 @@ class FrameMain(wx.Frame):
 
     def OnFileChanged(self, event):
         p = correct_file_name_in_unicode(event.GetEventObject().GetPath()) # unicode
-        event.GetEventObject().SetPath(p)
         if p == u'' or pat_eq_plot.match(p):
-            if event.GetEventObject().GetWindowStyle() & wx.FLP_FILE_MUST_EXIST:
-                event.GetEventObject().GetTextCtrl().SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_WINDOW))
+            event.GetEventObject().GetTextCtrl().SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_WINDOW))
         elif os.path.isfile(p):
+            event.GetEventObject().SetPath(p)
             if event.GetEventObject().GetWindowStyle() & wx.FLP_FILE_MUST_EXIST:
                 event.GetEventObject().GetTextCtrl().SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_WINDOW))
                 if event.GetEventObject().GetName() == 'filePicker_setting':
