@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 # matplotlibwx.py
 # by Yukiharu Iwamoto
-# 2024/6/10 9:50:52 AM
+# 2024/6/10 1:57:38 PM
 
 # Macの場合，文字入力後に引用符が勝手に変わったりしてうまく動かない．
 # 「システム環境設定」→「キーボード」→「ユーザー辞書」→「スマート引用符とスマートダッシュを使用」のチェックを外す．
 
-version = '2024/6/10 9:50:52 AM'
+version = '2024/6/10 1:57:38 PM'
 
 import os
 languages = os.environ.get('LANG')
@@ -1652,7 +1652,7 @@ class MyTable(wx.grid.GridTableBase):
             return False
 
 tooltip_tex = (_(u'$\\mathsf{ と }$ の間に書くとTeX形式になり，上付き，下付き文字やギリシア文字が使えます．\n例）') +
-    u'\n$\\mathsf{\\rho U_{inf}^2/2}$')
+    u'$\\mathsf{\\rho U_{inf}^2/2}$')
 
 class TableForGraph(MyTable):
     def __init__(self):
@@ -2163,14 +2163,18 @@ class FrameMain(wx.Frame):
         tooltip_column = (_(u"<テキストファイルの場合>\n" +
                             u" 1以上の整数または ' と ' で囲んだ数式\n" +
                             u" 数式中では列番号の前に$をつけます．\n 例）") +
-                            u"\n 'sqrt($3)*10'\n" +
+                            u"'sqrt($3)*10'\n" +
                           _(u"<エクセルファイル（拡張子がxlsまたはxlsx）またはcsvファイルの場合>\n" +
                             u" 'シート番号!読み取り開始のセル番号' で指定します．\n" +
                             u" 行方向にデータがあるものとします．\n" +
                             u" テキストファイルの場合と同様に，数式が使えます．\n 例）") +
-                            u"\n 'sqrt(1!A2)'")
+                            u"'sqrt(1!A2)'")
         tooltip_err_column = _(u'両側が空白の場合，指定しません．\nいずれかだけの場合，-+両側で同じデータを使用します．')
         tooltip_drag_and_drop = _(u'ドラッグ&ドロップで決めることもできます．')
+        tooltip_equation_scatter = (_(u"次の書式を用いた数式のプロットも可能です．\n" +
+                                      u"分割数の前の'/'を'L/'にすれば，対数軸上で等分割にできます：\n" +
+                                      u" 数式, 変数 = [最小値, 最大値]/分割数\n例）") +
+                                      u"sqrt(2.2*x), x = [0.0, 1.0]/100")
         tooltip_open_file = _(u'ファイルを開く')
 
         spinCtrlWidth = 118 if sys.platform == 'linux2' else 60
@@ -2217,8 +2221,7 @@ class FrameMain(wx.Frame):
             wx.FLP_USE_TEXTCTRL | wx.FLP_SAVE | wx.FLP_OVERWRITE_PROMPT | wx.FLP_SMALL)
         self.filePicker_png.SetForegroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_WINDOWTEXT))
         self.filePicker_png.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_WINDOW))
-        self.filePicker_png.SetToolTip(_(u'空白の場合，matplotlibのビューワーにグラフを表示します．\n' +
-            u'ドラッグ&ドロップで決めることもできます．'))
+        self.filePicker_png.SetToolTip(_(u'空白の場合，matplotlibのビューワーにグラフを表示します．\n') + tooltip_drag_and_drop)
         self.filePicker_png.SetDropTarget(MyFileDropTarget(self.filePicker_png))
         sbSizer1.Add(self.filePicker_png, 1, wx.ALIGN_CENTER_VERTICAL | wx.TOP | wx.BOTTOM, 5)
 
@@ -2616,7 +2619,7 @@ class FrameMain(wx.Frame):
                 wx.FLP_USE_TEXTCTRL | wx.FLP_OPEN | wx.FLP_FILE_MUST_EXIST | wx.FLP_SMALL, name = 'filePicker_scatter{:d}'.format(i)))
             self.filePickers_scatter[i].SetForegroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_WINDOWTEXT))
             self.filePickers_scatter[i].SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_WINDOW))
-            self.filePickers_scatter[i].SetToolTip(tooltip_drag_and_drop)
+            self.filePickers_scatter[i].SetToolTip(tooltip_drag_and_drop + '\n\n' + tooltip_equation_scatter)
             self.filePickers_scatter[i].SetDropTarget(MyFileDropTarget(self.filePickers_scatter[i]))
             bSizer3.Add(self.filePickers_scatter[i], 1, wx.ALIGN_CENTER_VERTICAL | wx.TOP | wx.BOTTOM, 5)
 
@@ -2853,7 +2856,11 @@ class FrameMain(wx.Frame):
             wx.FLP_USE_TEXTCTRL | wx.FLP_OPEN | wx.FLP_FILE_MUST_EXIST | wx.FLP_SMALL, name = 'filePicker_vector')
         self.filePicker_vector.SetForegroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_WINDOWTEXT))
         self.filePicker_vector.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_WINDOW))
-        self.filePicker_vector.SetToolTip(tooltip_drag_and_drop)
+        self.filePicker_vector.SetToolTip(tooltip_drag_and_drop + '\n\n' +
+            _(u"次の書式を用いた数式のプロットも可能です．\n" +
+              u"分割数の前の'/'を'L/'にすれば，対数軸上で等分割にできます：\n" +
+              u" [uの数式, vの数式], xの変数 = [最小値, 最大値]/分割数, yの変数 = [最小値, 最大値]/分割数\n例）") +
+              u"[cos(2.0*x), sin(y)], x = [-1.0, 1.0]/100, y = [-1.00, 1.0]/100")
         self.filePicker_vector.SetDropTarget(MyFileDropTarget(self.filePicker_vector))
         bSizer3.Add(self.filePicker_vector, 1, wx.ALIGN_CENTER_VERTICAL | wx.TOP | wx.BOTTOM, 5)
 
@@ -3035,7 +3042,12 @@ class FrameMain(wx.Frame):
             wx.FLP_USE_TEXTCTRL | wx.FLP_OPEN | wx.FLP_FILE_MUST_EXIST | wx.FLP_SMALL, name = 'filePicker_contour')
         self.filePicker_contour.SetForegroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_WINDOWTEXT))
         self.filePicker_contour.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_WINDOW))
-        self.filePicker_contour.SetToolTip(tooltip_drag_and_drop)
+        self.filePicker_contour.SetToolTip(tooltip_drag_and_drop + '\n\n' +
+            _(u"次の書式を用いた数式のプロットも可能です．\n" +
+              u"分割数の前の'/'を'L/'にすれば，対数軸上で等分割にできます：\n" +
+              u" 数式, xの変数 = [最小値, 最大値]/分割数, yの変数 = [最小値, 最大値]/分割数\n例）") +
+              u"sqrt(x)*y**2, x = [-1.0, 1.0]/100, y = [-1.0, 1.0]/100")
+        self.filePicker_vector.SetDropTarget(MyFileDropTarget(self.filePicker_vector))
         self.filePicker_contour.SetDropTarget(MyFileDropTarget(self.filePicker_contour))
         bSizer3.Add(self.filePicker_contour, 1, wx.ALIGN_CENTER_VERTICAL | wx.TOP | wx.BOTTOM, 5)
 
