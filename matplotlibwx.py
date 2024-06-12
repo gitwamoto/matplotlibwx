@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 # matplotlibwx.py
 # by Yukiharu Iwamoto
-# 2024/6/10 1:57:38 PM
+# 2024/6/12 12:34:44 PM
 
 # Macの場合，文字入力後に引用符が勝手に変わったりしてうまく動かない．
 # 「システム環境設定」→「キーボード」→「ユーザー辞書」→「スマート引用符とスマートダッシュを使用」のチェックを外す．
 
-version = '2024/6/10 1:57:38 PM'
+version = '2024/6/12 12:34:44 PM'
 
 import os
 languages = os.environ.get('LANG')
