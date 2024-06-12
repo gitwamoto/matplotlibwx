@@ -3896,7 +3896,8 @@ class FrameMain(wx.Frame):
                     continue
                 s += u"{\n    'type': 'scatter',\n"
                 s += u"    'zorder': {},\n".format(self.spinCtrls_zorder_scatter[n].GetValue())
-                file_plot = True if pat_eq_plot.match(fn) is None else False
+                eq = self.filePickers_scatter[n].GetTextCtrl().GetValue()
+                file_plot = True if pat_eq_plot.match(eq) is None else False
                 if file_plot:
                     fn = correct_file_name_in_unicode(os.path.relpath(fn, start = os.path.dirname(path)))
                     s += u"    'file_name': '{}',\n".format(fn.replace("\\", r"\\").replace("'", r"\'"))
@@ -3948,7 +3949,7 @@ class FrameMain(wx.Frame):
                     except:
                         s += u"    'every': 1,\n"
                 else: # not file_plot
-                    s += u"    'equation': '{}',\n".format(fn)
+                    s += u"    'equation': '{}',\n".format(eq)
                 v = self.choices_scatter_marker[n].GetSelection()
                 if v == len(markers) - 1:
                     s += u"    'marker': None,\n"
@@ -3990,7 +3991,8 @@ class FrameMain(wx.Frame):
             if fn != u'':
                 s += u"{\n    'type': 'vector',\n"
                 s += u"    'zorder': {},\n".format(self.spinCtrl_zorder_vector.GetValue())
-                file_plot = True if pat_eq_plot.match(fn) is None else False
+                eq = self.filePicker_vector.GetTextCtrl().GetValue()
+                file_plot = True if pat_eq_plot.match(eq) is None else False
                 if file_plot:
                     fn = correct_file_name_in_unicode(
                         os.path.relpath(fn, start = os.path.dirname(path)))
@@ -4015,7 +4017,7 @@ class FrameMain(wx.Frame):
                     except:
                         s += u"    'every': 1,\n"
                 else: # not file_plot
-                    s += u"    'equation': '{}',\n".format(fn)
+                    s += u"    'equation': '{}',\n".format(eq)
                 v = self.choice_vector_color.GetSelection()
                 if v == 0:
                     v = self.colourPicker_vector.GetColour()
@@ -4042,13 +4044,14 @@ class FrameMain(wx.Frame):
             if fn != u'':
                 s += u"{\n    'type': 'contour',\n"
                 s += u"    'zorder': {},\n".format(self.spinCtrl_zorder_contour.GetValue())
-                file_plot = True if pat_eq_plot.match(fn) is None else False
+                eq = self.filePicker_contour.GetTextCtrl().GetValue()
+                file_plot = True if pat_eq_plot.match(eq) is None else False
                 if file_plot:
                     fn = correct_file_name_in_unicode(
                         os.path.relpath(fn, start = os.path.dirname(path)))
                     s += u"    'file_name': '{}',\n".format(fn.replace("\\", r"\\").replace("'", r"\'"))
                 else: # not file_plot
-                    s += u"    'equation': '{}',\n".format(fn)
+                    s += u"    'equation': '{}',\n".format(eq)
                 s += u"    'grid_pattern': " + str(self.checkBox_contour_grid_pattern.GetValue()) + u",\n"
                 s += u"    'show_triangle': " + str(self.checkBox_contour_show_triangle.GetValue()) + u",\n"
                 if file_plot:
