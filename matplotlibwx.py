@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 # matplotlibwx.py
 # by Yukiharu Iwamoto
-# 2024/6/17 1:46:06 PM
+# 2024/6/17 2:02:23 PM
 
 # Macの場合，文字入力後に引用符が勝手に変わったりしてうまく動かない．
 # 「システム環境設定」→「キーボード」→「ユーザー辞書」→「スマート引用符とスマートダッシュを使用」のチェックを外す．
 
-version = '2024/6/17 1:46:06 PM'
+version = '024/6/17 2:02:23 PM'
 
 import os
 languages = os.environ.get('LANG')
@@ -4208,7 +4208,6 @@ class FrameMain(wx.Frame):
                     for name in files:
                         if re.match('\\._.+|[._]+DS_Store', name):
                             os.remove(os.path.join(curDir, name))
-#            with wx.MessageDialog(self, _(u'プログラムを実行し直すとアップデートが有効になります．'),
             with wx.MessageDialog(self, _(u'アップデートされました．再起動します．'),
                 _(u'アップデート完了'), style = wx.ICON_INFORMATION) as md:
                 md.ShowModal()
