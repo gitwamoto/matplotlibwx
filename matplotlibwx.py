@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 # matplotlibwx.py
 # by Yukiharu Iwamoto
-# 2024/6/17 2:02:23 PM
+# 2024/6/26 2:26:49 PM
 
 # Macの場合，文字入力後に引用符が勝手に変わったりしてうまく動かない．
 # 「システム環境設定」→「キーボード」→「ユーザー辞書」→「スマート引用符とスマートダッシュを使用」のチェックを外す．
 
-version = '024/6/17 2:02:23 PM'
+version = '2024/6/26 2:26:49 PM'
 
 import os
 languages = os.environ.get('LANG')
@@ -129,6 +129,7 @@ paint_styles_wx = (_(u'虹色'), _(u'白→黒'), _(u'黒→白'), _(u'白→赤
 pat_math = re.compile(r'(?<![a-zA-Z0-9_.\s])\s*((?!abs\s*\()[a-z0-9]+\s*\(|(?:pi|e)(?![a-zA-Z0-9_.(]))')
 pat_eq_plot = re.compile(r'(?:\s+|)(.+?)\s*,\s*([^,=]+?)\s*=\s*\[\s*(.+?)\s*,\s*(.+?)\s*\]\s*(L?/)\s*(.+?)\s*' +
                                       r'(?:,\s*([^,=]+?)\s*=\s*\[\s*(.+?)\s*,\s*(.+?)\s*\]\s*(L?/)\s*(.+?)\s*)?$')
+pat_cell = re.compile(r'([0-9]+)\s*!\s*([a-zA-Z]+)\s*([0-9]+)')
 
 def get_file_from_google_drive(file_id):
     r = requests.get('https://drive.google.com/uc', params = {'export': 'download', 'id': file_id})
@@ -295,7 +296,6 @@ def data_from_file(file_name, columns = (1, 2), every = 1, skip = '#', delimiter
             file_name = os.path.join(os.path.dirname(file_name), zf.namelist()[0])
     if file_name.endswith(u'.csv'):
         columns1 = []
-        pat_cell = re.compile(r'[0-9]+\s*!\s*([a-zA-Z]+)\s*([0-9]+)')
         for i in columns:
             i = pat_math.sub(r'math.\1', i)
             s = ['']
@@ -303,7 +303,7 @@ def data_from_file(file_name, columns = (1, 2), every = 1, skip = '#', delimiter
                 r = pat_cell.search(i)
                 if r is not None:
                     s[-1] += i[:r.start()] + '('
-                    s.append([alphabet_to_number(r.group(1)) - 1, int(r.group(2)) - 1])
+                    s.append([alphabet_to_number(r.group(2)) - 1, int(r.group(3)) - 1])
                     s.append(')')
                     if r.end() == len(i):
                         break
@@ -356,7 +356,6 @@ def data_from_file(file_name, columns = (1, 2), every = 1, skip = '#', delimiter
                     break
     elif file_name.endswith(u'.xls') or file_name.endswith(u'.xlsx') or file_name.endswith(u'.xlsm'):
         columns1 = []
-        pat_cell = re.compile(r'([0-9]+)\s*!\s*([a-zA-Z]+)\s*([0-9]+)')
         for i in columns:
             i = pat_math.sub(r'math.\1', i)
             s = ['']
