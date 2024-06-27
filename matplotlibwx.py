@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 # matplotlibwx.py
 # by Yukiharu Iwamoto
-# 2024/6/27 9:04:42 AM
+# 2024/6/27 9:07:27 AM
 
 # Macの場合，文字入力後に引用符が勝手に変わったりしてうまく動かない．
 # 「システム環境設定」→「キーボード」→「ユーザー辞書」→「スマート引用符とスマートダッシュを使用」のチェックを外す．
 
-version = '2024/6/27 9:04:42 AM'
+version = '2024/6/27 9:07:27 AM'
 
 import os
 languages = os.environ.get('LANG')
@@ -130,6 +130,7 @@ pat_math = re.compile(r'(?<![a-zA-Z0-9_.\s])\s*((?!abs\s*\()[a-z0-9]+\s*\(|(?:pi
 pat_eq_plot = re.compile(r'(?:\s+|)(.+?)\s*,\s*([^,=]+?)\s*=\s*\[\s*(.+?)\s*,\s*(.+?)\s*\]\s*(L?/)\s*(.+?)\s*' +
                                       r'(?:,\s*([^,=]+?)\s*=\s*\[\s*(.+?)\s*,\s*(.+?)\s*\]\s*(L?/)\s*(.+?)\s*)?$')
 pat_cell = re.compile(r'([0-9]+)\s*!\s*([a-zA-Z]+)\s*([0-9]+)')
+pat_col = re.compile(r'\$([0-9]+)')
 
 def get_file_from_google_drive(file_id):
     r = requests.get('https://drive.google.com/uc', params = {'export': 'download', 'id': file_id})
@@ -422,7 +423,6 @@ def data_from_file(file_name, columns = (1, 2), every = 1, skip = '#', delimiter
                     break
     else:
         columns1 = []
-        pat_col = re.compile(r'\$([0-9]+)')
         for i in columns:
             if type(i) is int:
                 columns1.append(i - 1)
