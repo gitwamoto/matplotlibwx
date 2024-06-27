@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 # matplotlibwx.py
 # by Yukiharu Iwamoto
-# 2024/6/26 2:26:49 PM
+# 2024/6/27 9:04:42 AM
 
 # Macの場合，文字入力後に引用符が勝手に変わったりしてうまく動かない．
 # 「システム環境設定」→「キーボード」→「ユーザー辞書」→「スマート引用符とスマートダッシュを使用」のチェックを外す．
 
-version = '2024/6/26 2:26:49 PM'
+version = '2024/6/27 9:04:42 AM'
 
 import os
 languages = os.environ.get('LANG')
@@ -144,11 +144,11 @@ def get_file_from_google_drive(file_id):
             else: # https://github.com/wkentaro/gdown/blob/1bf9e20442a0df57eec3e75a15ef4115dbec9b2f/gdown/download.py#L32
                 m = re.search(b'id="downloadForm" action=".+?&amp;confirm=(.+?)"', r.content)
                 if m:
-                    code = m.group(1)
+                    code = m[1]
                 else:
                     m = re.search(b'&amp;confirm=t&amp;uuid=(.+?)"', r.content)
                     if m:
-                        code = m.group(1)
+                        code = m[1]
             r = requests.get('https://drive.google.com/uc',
                 params = {'export': 'download', 'confirm': code, 'id': file_id}, cookies = cookies)
             if not r.ok:
@@ -303,7 +303,7 @@ def data_from_file(file_name, columns = (1, 2), every = 1, skip = '#', delimiter
                 r = pat_cell.search(i)
                 if r is not None:
                     s[-1] += i[:r.start()] + '('
-                    s.append([alphabet_to_number(r.group(2)) - 1, int(r.group(3)) - 1])
+                    s.append([alphabet_to_number(r[2]) - 1, int(r[3]) - 1])
                     s.append(')')
                     if r.end() == len(i):
                         break
@@ -363,7 +363,7 @@ def data_from_file(file_name, columns = (1, 2), every = 1, skip = '#', delimiter
                 r = pat_cell.search(i)
                 if r is not None:
                     s[-1] += i[:r.start()] + '('
-                    s.append([int(r.group(1)) - 1, alphabet_to_number(r.group(2)) - 1, int(r.group(3)) - 1])
+                    s.append([int(r[1]) - 1, alphabet_to_number(r[2]) - 1, int(r[3]) - 1])
                     s.append(')')
                     if r.end() == len(i):
                         break
@@ -433,7 +433,7 @@ def data_from_file(file_name, columns = (1, 2), every = 1, skip = '#', delimiter
                     r = pat_col.search(i)
                     if r is not None:
                         s[-1] += i[:r.start()] + '('
-                        s.append(int(r.group(1)) - 1)
+                        s.append(int(r[1]) - 1)
                         s.append(')')
                         if r.end() == len(i):
                             break
@@ -4172,7 +4172,7 @@ class FrameMain(wx.Frame):
                 md.ShowModal()
             return
         r = re.search(b"version\\s*=\\s*'([0-9/ :APM]+)'\n", s[0])
-        if r is not None and time_str_a_is_newer_than_b(a = r.group(1).decode(s[1]), b = version):
+        if r is not None and time_str_a_is_newer_than_b(a = r[1].decode(s[1]), b = version):
             p = correct_file_name_in_unicode(os.path.realpath(decode_if_necessary(__file__)))
             with open(p, 'wb') as f:
                 f.write(s[0])
