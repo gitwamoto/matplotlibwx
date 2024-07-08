@@ -2,17 +2,17 @@
 # -*- coding: utf-8 -*-
 # matplotlibwx.py
 # by Yukiharu Iwamoto
-# 2024/6/27 12:58:19 PM
+# 2024/7/8 12:49:55 PM
 
 # Macの場合，文字入力後に引用符が勝手に変わったりしてうまく動かない．
 # 「システム環境設定」→「キーボード」→「ユーザー辞書」→「スマート引用符とスマートダッシュを使用」のチェックを外す．
 
-version = '2024/6/27 12:58:19 PM'
+version = '2024/7/8 12:49:55 PM'
 
 import os
 languages = os.environ.get('LANG')
 #languages = ['en']
-#languages = ['ja']
+languages = ['ja']
 
 # https://code-examples.net/ja/docs/matplotlib~2.1/index
 # https://code-examples.net/ja/docs/matplotlib~3.0/index
@@ -494,6 +494,9 @@ def data_from_equation(equation, param_dict = None):
     #  'sqrt(2.2*x), x = [0.0, 1.0]/100'
     #       1              2    3      4      5    6
     #    -> 'sqrt(2.2*x)', 'x', '0.0', '1.0', '/', '100'
+    #  '[cos(t), sin(t)], t = [0.0, pi]/100'
+    #       1                    2   3       4    5    6
+    #    -> '[cos(t), sin(t)]', 't', '0.0', 'pi', '/', '100'
     #  'sqrt(x)*y**2, x = [-1.0, 1.0]/100, y = [-1.0, 1.0]/100'
     #       1               2    3       4      5    6      7    8       9      10   11
     #    -> 'sqrt(x)*y**2', 'x', '-1.0', '1.0', '/', '100', 'y', '-1.0', '1.0', '/', '100'
@@ -524,12 +527,12 @@ def data_from_equation(equation, param_dict = None):
         for i in range(div_x + 1):
             vx = x0*dx**i if log_x else x0 + dx*i
             param_dict[x] = vx
-            data[0].append(vx)
             v = eval(eq, param_dict)
             if isinstance(v, list):
-                data[1].append(float(v[0]))
-                data[2].append(float(v[1]))
+                data[0].append(float(v[0]))
+                data[1].append(float(v[1]))
             else:
+                data[0].append(vx)
                 data[1].append(float(v))
     else: # y is not None
         y_val = param_dict[y] if y in param_dict else None
@@ -2173,8 +2176,8 @@ class FrameMain(wx.Frame):
         tooltip_drag_and_drop = _(u'ドラッグ&ドロップで決めることもできます．')
         tooltip_equation_scatter = (_(u"次の書式を用いた数式のプロットも可能です．\n" +
                                       u"分割数の前の'/'を'L/'にすれば，対数軸上で等分割にできます：\n" +
-                                      u" 数式, 変数 = [最小値, 最大値]/分割数\n例）") +
-                                      u"sqrt(2.2*x), x = [0.0, 1.0]/100")
+                                      u" 数式, 変数 = [最小値, 最大値]/分割数\n [xの数式, yの数式], 変数 = [最小値, 最大値]/分割数\n例）") +
+                                      u"sqrt(2.2*x), x = [0.0, 1.0]/100\n        [cos(t), sin(t)], t = [0.0, pi]/100")
         tooltip_open_file = _(u'ファイルを開く')
 
         spinCtrlWidth = 118 if sys.platform == 'linux2' else 60
