@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 # matplotlibwx.py
 # by Yukiharu Iwamoto
-# 2024/7/8 12:49:55 PM
+# 2024/7/24 5:01:15 PM
 
 # Macの場合，文字入力後に引用符が勝手に変わったりしてうまく動かない．
 # 「システム環境設定」→「キーボード」→「ユーザー辞書」→「スマート引用符とスマートダッシュを使用」のチェックを外す．
 
-version = '2024/7/8 12:49:55 PM'
+version = '2024/7/24 5:01:15 PM'
 
 import os
 languages = os.environ.get('LANG')
@@ -314,11 +314,11 @@ def data_from_file(file_name, columns = (1, 2), every = 1, skip = '#', delimiter
                     break
             columns1.append(s)
         data = [[] for i in range(len(columns1))]
-        if sys.version_info.major <= 2:
-            with open(file_name, 'r') as f:
+        try:
+            with codecs.open(file_name, 'r', encoding = 'UTF-8') as f:
                 lines = list(csv.reader(f))
-        else:
-            with open(file_name, 'r', encoding = 'CP932') as f:
+        except:
+            with codecs.open(file_name, 'r', encoding = 'CP932') as f:
                 lines = list(csv.reader(f))
         n_lines = len(lines)
         for i in columns1:
