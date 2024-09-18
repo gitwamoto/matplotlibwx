@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 # matplotlibwx.py
 # by Yukiharu Iwamoto
-# 2024/7/24 5:01:15 PM
+# 2024/9/18 2:58:35 PM
 
 # Macの場合，文字入力後に引用符が勝手に変わったりしてうまく動かない．
 # 「システム環境設定」→「キーボード」→「ユーザー辞書」→「スマート引用符とスマートダッシュを使用」のチェックを外す．
 
-version = '2024/7/24 5:01:15 PM'
+version = '2024/9/18 2:58:35 PM'
 
 import os
 languages = os.environ.get('LANG')
@@ -286,6 +286,8 @@ def make_gif_from_pngs(png_file_lists, gif_file_name, duration_ms = 400, loop = 
 def data_from_file(file_name, columns = (1, 2), every = 1, skip = '#', delimiter = None, terminator = None, param_dict = None):
     # columns = (int | '$1 + 2', ...) for text file
     # columns = ('1!B3', ...) for excel sheet
+    if delimiter is None:
+        delimiter = r'\t| +'
     if param_dict is not None:
         param_dict['math'] = globals()['math']
     file_name = correct_file_name_in_unicode(file_name) # unicode
@@ -444,14 +446,14 @@ def data_from_file(file_name, columns = (1, 2), every = 1, skip = '#', delimiter
                 columns1.append(s)
         data = [[] for i in range(len(columns1))]
         for line in open(file_name, 'rb'):
-            line = line.strip()
+            line = line.rstrip()
             try:
                 line = line.decode('UTF-8') # unicode
             except:
                 line = line.decode('CP932') # unicode
             if line == u'' or skip is not None and line.startswith(skip):
                 continue
-            line = line.split(delimiter)
+            line = re.split(delimiter, line)
             if len(line) < 2:
                 raise ValueError('Inappropriate delimiter.')
             stop = has_None = False
