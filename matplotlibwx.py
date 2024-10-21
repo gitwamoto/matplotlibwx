@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 # matplotlibwx.py
 # by Yukiharu Iwamoto
-# 2024/9/18 2:58:35 PM
+# 2024/10/21 5:34:30 PM
 
 # Macの場合，文字入力後に引用符が勝手に変わったりしてうまく動かない．
 # 「システム環境設定」→「キーボード」→「ユーザー辞書」→「スマート引用符とスマートダッシュを使用」のチェックを外す．
 
-version = '2024/9/18 2:58:35 PM'
+version = '2024/10/21 5:34:30 PM'
 
 import os
 languages = os.environ.get('LANG')
@@ -287,7 +287,7 @@ def data_from_file(file_name, columns = (1, 2), every = 1, skip = '#', delimiter
     # columns = (int | '$1 + 2', ...) for text file
     # columns = ('1!B3', ...) for excel sheet
     if delimiter is None:
-        delimiter = r'\t| +'
+        delimiter = r'\t| +\t?'
     if param_dict is not None:
         param_dict['math'] = globals()['math']
     file_name = correct_file_name_in_unicode(file_name) # unicode
