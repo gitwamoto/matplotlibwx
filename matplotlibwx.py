@@ -511,7 +511,6 @@ def data_from_equation(equation, param_dict = None):
     equation = equation.replace('^', '**')
     r = pat_eq_plot.match(equation)
     eq = pat_math.sub(r'math.\1', r[1])
-    print(eq)
 
     x = r[2]
     x_val = param_dict[x] if x in param_dict else None
