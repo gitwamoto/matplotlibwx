@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 # matplotlibwx.py
 # by Yukiharu Iwamoto
-# 2024/11/10 5:49:30 PM
+# 2024/11/10 6:24:58 PM
 
 # Macの場合，文字入力後に引用符が勝手に変わったりしてうまく動かない．
 # 「システム環境設定」→「キーボード」→「ユーザー辞書」→「スマート引用符とスマートダッシュを使用」のチェックを外す．
 
-version = '2024/11/10 5:49:30 PM'
+version = '2024/11/10 6:24:58 PM'
 
 import os
 languages = os.environ.get('LANG')
@@ -267,9 +267,7 @@ def make_gif_from_pngs(png_file_lists, gif_file_name, duration_ms = 400, loop = 
     gif_file_name = correct_file_name_in_unicode(gif_file_name) # unicode
     if not gif_file_name.endswith(u'.gif'):
         gif_file_name += u'.gif'
-    images = []
-    for png_file in png_file_lists:
-        images.append(Image.open(correct_file_name_in_unicode(png_file)))
+    images = [Image.open(correct_file_name_in_unicode(png_file)) for png_file in png_file_lists]
     images[0].save(gif_file_name, save_all = True, append_images = images[1:],
         duration = duration_ms, loop = loop)
     if remove:
