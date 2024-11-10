@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 # matplotlibwx.py
 # by Yukiharu Iwamoto
-# 2024/10/21 5:34:30 PM
+# 2024/11/10 5:49:30 PM
 
 # Macの場合，文字入力後に引用符が勝手に変わったりしてうまく動かない．
 # 「システム環境設定」→「キーボード」→「ユーザー辞書」→「スマート引用符とスマートダッシュを使用」のチェックを外す．
 
-version = '2024/10/21 5:34:30 PM'
+version = '2024/11/10 5:49:30 PM'
 
 import os
 languages = os.environ.get('LANG')
@@ -126,7 +126,7 @@ by_what_show_z_wx = (_(u'虹色'), _(u'白→黒'), _(u'黒→白'), _(u'白→�
 paint_styles = ('rainbow', 'wb', 'bw', 'wR', 'wB', None) # str
 paint_styles_wx = (_(u'虹色'), _(u'白→黒'), _(u'黒→白'), _(u'白→赤'), _(u'白→青'), _(u'塗りなし')) # unicode
 
-pat_math = re.compile(r'(?<![a-zA-Z0-9_.\s])\s*((?!abs\s*\()[a-z0-9]+\s*\(|(?:pi|e)(?![a-zA-Z0-9_.(]))')
+pat_math = re.compile(r'(?<![a-zA-Z0-9_.\s])\s*((?!(?:abs|max|min)\s*\()[a-z0-9]+\s*\(|(?:pi|e)(?![a-zA-Z0-9_.(]))')
 pat_eq_plot = re.compile(r'(?:\s+|)(.+?)\s*,\s*([^,=]+?)\s*=\s*\[\s*(.+?)\s*,\s*(.+?)\s*\]\s*(L?/)\s*(.+?)\s*' +
                                       r'(?:,\s*([^,=]+?)\s*=\s*\[\s*(.+?)\s*,\s*(.+?)\s*\]\s*(L?/)\s*(.+?)\s*)?$')
 pat_cell = re.compile(r'([0-9]+)\s*!\s*([a-zA-Z]+)\s*([0-9]+)')
@@ -511,6 +511,7 @@ def data_from_equation(equation, param_dict = None):
     equation = equation.replace('^', '**')
     r = pat_eq_plot.match(equation)
     eq = pat_math.sub(r'math.\1', r[1])
+    print(eq)
 
     x = r[2]
     x_val = param_dict[x] if x in param_dict else None
