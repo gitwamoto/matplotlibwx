@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 # matplotlibwx.py
 # by Yukiharu Iwamoto
-# 2024/11/10 6:24:58 PM
+# 2024/11/28 5:44:16 PM
 
 # Macの場合，文字入力後に引用符が勝手に変わったりしてうまく動かない．
 # 「システム環境設定」→「キーボード」→「ユーザー辞書」→「スマート引用符とスマートダッシュを使用」のチェックを外す．
 
-version = '2024/11/10 6:24:58 PM'
+version = '2024/11/28 5:44:16 PM'
 
 import os
 languages = os.environ.get('LANG')
@@ -49,6 +49,7 @@ import codecs
 import platform
 import pyperclip # pip install pyperclip
 import webbrowser
+import scipy
 
 def decode_if_necessary(s):
     return s.decode('CP932' if sys.platform == 'win32' else 'UTF-8') if sys.version_info.major <= 2 and type(s) is str else s
@@ -506,6 +507,7 @@ def data_from_equation(equation, param_dict = None):
     if param_dict is None:
         param_dict = {}
     param_dict['math'] = globals()['math']
+    param_dict['scipy'] = globals()['scipy']
     equation = equation.replace('^', '**')
     r = pat_eq_plot.match(equation)
     eq = pat_math.sub(r'math.\1', r[1])
