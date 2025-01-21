@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 # matplotlibwx.py
 # by Yukiharu Iwamoto
-# 2025/1/21 11:36:29 AM
+# 2025/1/21 1:27:45 PM
 
 # Macの場合，文字入力後に引用符が勝手に変わったりしてうまく動かない．
 # 「システム環境設定」→「キーボード」→「ユーザー辞書」→「スマート引用符とスマートダッシュを使用」のチェックを外す．
 
-version = '2025/1/21 11:36:29 AM'
+version = '2025/1/21 1:27:45 PM'
 
 import os
 languages = os.environ.get('LANG')
@@ -1125,7 +1125,7 @@ def plot(dict_lists, show = True):
                     d['err'] = []
                     e = len(i['columns'])
                     for j in i['err_columns']:
-                        if type(j) is tuple:
+                        if type(j) is list: # i['err_columns'] = list(i['err_columns'])
                             d['err'].append([d['data'][e], d['data'][e + 1]])
                             e += 2
                         elif j is not None:
