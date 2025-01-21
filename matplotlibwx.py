@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 # matplotlibwx.py
 # by Yukiharu Iwamoto
-# 2024/11/28 5:44:16 PM
+# 2025/1/21 11:36:29 AM
 
 # Macの場合，文字入力後に引用符が勝手に変わったりしてうまく動かない．
 # 「システム環境設定」→「キーボード」→「ユーザー辞書」→「スマート引用符とスマートダッシュを使用」のチェックを外す．
 
-version = '2024/11/28 5:44:16 PM'
+version = '2025/1/21 11:36:29 AM'
 
 import os
 languages = os.environ.get('LANG')
@@ -3938,7 +3938,7 @@ class FrameMain(wx.Frame):
                                     s += u"'{}', ".format(v[0].strip(u"'"))
                         else:
                             if fn.endswith(u'.csv') or fn.endswith(u'.xls') or fn.endswith(u'.xlsx'):
-                                s += u"('{}', '{}'), ".format(v[0].strip(u"'"), v[1])
+                                s += u"('{}', '{}'), ".format(v[0].strip(u"'"), v[1].strip(u"'"))
                             else:
                                 try:
                                     s += u"({}, ".format(int(v[0]))
