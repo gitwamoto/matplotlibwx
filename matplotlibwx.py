@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # matplotlibwx.py
 # by Yukiharu Iwamoto
-# 2025/1/21 1:27:45 PM
+# 2025/4/2 4:40:25 PM
 
 # Macの場合，文字入力後に引用符が勝手に変わったりしてうまく動かない．
 # 「システム環境設定」→「キーボード」→「ユーザー辞書」→「スマート引用符とスマートダッシュを使用」のチェックを外す．
@@ -1330,7 +1330,7 @@ def make_script(s, file_name):
         f.write(u'    # プロット，画像を表示させたい場合はshow = Trueにする\n')
         f.write(u"    %s.plot(%s.evaluate_plot_settings(s, u'.'), show = False)\n" % (module_name, module_name))
         f.write(u'    # gifアニメーションを作る\n')
-        f.write(u'#    ' + module_name + u'.make_gif_from_pngs(\n' +
+        f.write('#    ' + module_name + '.make_gif_from_pngs(\n' +
             u"#        png_file_lists = [u'a1.png', u'a2.png', ...], # 元データであるpngファイルのリスト，要変更\n" +
             u"#        gif_file_name = u'a.gif', # 作られるgifアニメーションファイル名，要変更\n" +
             u'#        duration_ms = 400, # 1コマあたりの時間 [ms]，必要に応じて変更\n' +
@@ -1731,9 +1731,9 @@ class TableForText(MyTable):
         self.col_labels = (_(u'座標系'), _(u'横座標'), _(u'縦座標'), _(u'文字揃え'), _(u'文字列'), _(u'サイズ'), u'Z-order')
         self.col_sizes = (60, 70, 70, 70, 320, 60, 60)
         self.tooltips = ((tooltip_coordinate, None, None, None, tooltip_tex, None, tooltip_zorder),)
-        self.data_types = (wx.grid.GRID_VALUE_CHOICE + u':axes,data', wx.grid.GRID_VALUE_STRING, wx.grid.GRID_VALUE_STRING,
+        self.data_types = (wx.grid.GRID_VALUE_CHOICE + ':axes,data', wx.grid.GRID_VALUE_STRING, wx.grid.GRID_VALUE_STRING,
                            wx.grid.GRID_VALUE_CHOICE + _(u':左,中央,右'), wx.grid.GRID_VALUE_STRING, wx.grid.GRID_VALUE_STRING,
-                           wx.grid.GRID_VALUE_NUMBER + u':{:d},{:d}'.format(zorder_min, zorder_max))
+                           wx.grid.GRID_VALUE_NUMBER + ':{:d},{:d}'.format(zorder_min, zorder_max))
         self.new_data = ['axes', None, None, 'l', None, plt.rcParams['font.size'], zorder_others]
         self.data = [self.new_data[:], self.new_data[:], self.new_data[:]]
 
@@ -1795,10 +1795,10 @@ class TableForArrow(MyTable):
         self.col_sizes = (60, 85, 85, 85, 85, 85, 80, 85, 60)
         self.tooltips = ((tooltip_coordinate, None, None, None, None, None, None,
                           _(u'0にすれば直線になります'), tooltip_zorder),)
-        self.data_types = (wx.grid.GRID_VALUE_CHOICE + u':axes,data', wx.grid.GRID_VALUE_STRING,
+        self.data_types = (wx.grid.GRID_VALUE_CHOICE + ':axes,data', wx.grid.GRID_VALUE_STRING,
                            wx.grid.GRID_VALUE_STRING, wx.grid.GRID_VALUE_STRING, wx.grid.GRID_VALUE_STRING,
-                           wx.grid.GRID_VALUE_STRING, wx.grid.GRID_VALUE_CHOICE + u':' + u','.join(line_styles_wx[:-1]),
-                           wx.grid.GRID_VALUE_STRING, wx.grid.GRID_VALUE_NUMBER + u':{:d},{:d}'.format(zorder_min, zorder_max))
+                           wx.grid.GRID_VALUE_STRING, wx.grid.GRID_VALUE_CHOICE + ':' + ','.join(line_styles_wx[:-1]),
+                           wx.grid.GRID_VALUE_STRING, wx.grid.GRID_VALUE_NUMBER + ':{:d},{:d}'.format(zorder_min, zorder_max))
         self.new_data = ['axes', None, None, None, None, 1.0, line_styles[0], 12.0, zorder_others]
         self.data = [self.new_data[:], self.new_data[:], self.new_data[:]]
 
@@ -1853,10 +1853,10 @@ class TableForEllipse(MyTable):
                            _(u'幅'), _(u'高さ'), _(u'角度[deg]'), _(u'線幅'), _(u'塗りつぶし'), u'Z-order')
         self.col_sizes = (60, 95, 95, 85, 85, 80, 80, 70, 60)
         self.tooltips = ((tooltip_coordinate, None, None, None, None, _(u'反時計回りに正'), None, None, tooltip_zorder),)
-        self.data_types = (wx.grid.GRID_VALUE_CHOICE + u':axes,data', wx.grid.GRID_VALUE_STRING,
+        self.data_types = (wx.grid.GRID_VALUE_CHOICE + ':axes,data', wx.grid.GRID_VALUE_STRING,
                            wx.grid.GRID_VALUE_STRING, wx.grid.GRID_VALUE_STRING, wx.grid.GRID_VALUE_STRING,
                            wx.grid.GRID_VALUE_STRING, wx.grid.GRID_VALUE_STRING, wx.grid.GRID_VALUE_BOOL,
-                           wx.grid.GRID_VALUE_NUMBER + u':{:d},{:d}'.format(zorder_min, zorder_max))
+                           wx.grid.GRID_VALUE_NUMBER + ':{:d},{:d}'.format(zorder_min, zorder_max))
         self.new_data = ['axes', None, None, None, None, 0.0, 1.0, False, zorder_others]
         self.data = [self.new_data[:], self.new_data[:], self.new_data[:]]
 
@@ -1908,9 +1908,9 @@ class TableForPolygon(MyTable):
         self.tooltips = ((tooltip_coordinate,
                          _(u'1点目の横座標, 1点目の縦座標, 2点目の横座標, 2点目の縦座標, ...\nのようにコンマ区切りで記入'),
                          None, None, tooltip_zorder),)
-        self.data_types = (wx.grid.GRID_VALUE_CHOICE + u':axes,data', wx.grid.GRID_VALUE_STRING,
+        self.data_types = (wx.grid.GRID_VALUE_CHOICE + ':axes,data', wx.grid.GRID_VALUE_STRING,
                            wx.grid.GRID_VALUE_STRING, wx.grid.GRID_VALUE_BOOL,
-                           wx.grid.GRID_VALUE_NUMBER + u':{:d},{:d}'.format(zorder_min, zorder_max))
+                           wx.grid.GRID_VALUE_NUMBER + ':{:d},{:d}'.format(zorder_min, zorder_max))
         self.new_data = ['axes', None, 1.0, False, zorder_others]
         self.data = [self.new_data[:], self.new_data[:], self.new_data[:]]
 
@@ -1973,10 +1973,10 @@ class TableForNaca4(MyTable):
                            _(u'後縁横座標'), _(u'後縁縦座標'), _(u'線幅'), _(u'塗りつぶし'), u'Z-order')
         self.col_sizes = (60, 60, 95, 95, 95, 95, 80, 70, 60)
         self.tooltips = ((None, tooltip_coordinate, None, None, None, None, None, None, tooltip_zorder),)
-        self.data_types = (wx.grid.GRID_VALUE_STRING, wx.grid.GRID_VALUE_CHOICE + u':axes,data',
+        self.data_types = (wx.grid.GRID_VALUE_STRING, wx.grid.GRID_VALUE_CHOICE + ':axes,data',
                            wx.grid.GRID_VALUE_STRING, wx.grid.GRID_VALUE_STRING, wx.grid.GRID_VALUE_STRING,
                            wx.grid.GRID_VALUE_STRING, wx.grid.GRID_VALUE_STRING,
-                           wx.grid.GRID_VALUE_BOOL, wx.grid.GRID_VALUE_NUMBER + u':{:d},{:d}'.format(zorder_min, zorder_max))
+                           wx.grid.GRID_VALUE_BOOL, wx.grid.GRID_VALUE_NUMBER + ':{:d},{:d}'.format(zorder_min, zorder_max))
         self.new_data = [None, 'axes', None, None, None, None, 1.0, False, zorder_others]
         self.data = [self.new_data[:], self.new_data[:], self.new_data[:]]
 
@@ -2153,7 +2153,7 @@ class GridWithCellToolTip(wx.grid.Grid):
 class FrameMain(wx.Frame):
     def __init__(self, parent):
         wx.Frame.__init__(self, parent, id = wx.ID_ANY,
-            title = u'matplotlibwx (' + version + u') by Python ' + platform.python_version(),
+            title = 'matplotlibwx (' + version + ') by Python ' + platform.python_version(),
             pos = wx.DefaultPosition, size = wx.Size(800, 700), style = wx.DEFAULT_FRAME_STYLE | wx.TAB_TRAVERSAL)
         self.SetSizeHints(wx.DefaultSize, wx.DefaultSize)
         self.SetForegroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_WINDOWTEXT))
@@ -3158,53 +3158,53 @@ class FrameMain(wx.Frame):
         self.menubar = wx.MenuBar(0)
 
         self.menu_file = wx.Menu()
-        self.menuItem_open = wx.MenuItem(self.menu_file, wx.ID_ANY, _(u'開く') + u'\tCtrl+O', wx.EmptyString, wx.ITEM_NORMAL)
+        self.menuItem_open = wx.MenuItem(self.menu_file, wx.ID_ANY, _(u'開く') + '\tCtrl+O', wx.EmptyString, wx.ITEM_NORMAL)
         self.menu_file.Append(self.menuItem_open)
-        self.menuItem_save = wx.MenuItem(self.menu_file, wx.ID_ANY, _(u'保存') + u'\tCtrl+S', wx.EmptyString, wx.ITEM_NORMAL)
+        self.menuItem_save = wx.MenuItem(self.menu_file, wx.ID_ANY, _(u'保存') + '\tCtrl+S', wx.EmptyString, wx.ITEM_NORMAL)
         self.menu_file.Append(self.menuItem_save)
-        self.menuItem_close = wx.MenuItem(self.menu_file, wx.ID_ANY, _(u'閉じる') + u'\tCtrl+W', wx.EmptyString, wx.ITEM_NORMAL)
+        self.menuItem_close = wx.MenuItem(self.menu_file, wx.ID_ANY, _(u'閉じる') + '\tCtrl+W', wx.EmptyString, wx.ITEM_NORMAL)
         self.menu_file.Append(self.menuItem_close)
         self.menu_file.AppendSeparator()
-        self.menuItem_save_as = wx.MenuItem(self.menu_file, wx.ID_ANY, _(u'別名で保存') + u'\tShift+Ctrl+S',
+        self.menuItem_save_as = wx.MenuItem(self.menu_file, wx.ID_ANY, _(u'別名で保存') + '\tShift+Ctrl+S',
             wx.EmptyString, wx.ITEM_NORMAL)
         self.menu_file.Append(self.menuItem_save_as)
         self.menu_file.AppendSeparator()
-        self.menuItem_save_as_script = wx.MenuItem(self.menu_file, wx.ID_ANY, _(u'pythonスクリプト形式で保存') + u'\tCtrl+K',
+        self.menuItem_save_as_script = wx.MenuItem(self.menu_file, wx.ID_ANY, _(u'pythonスクリプト形式で保存') + '\tCtrl+K',
             wx.EmptyString, wx.ITEM_NORMAL)
         self.menu_file.Append(self.menuItem_save_as_script)
         self.menu_file.AppendSeparator()
-        self.menuItem_make_template = wx.MenuItem(self.menu_file, wx.ID_ANY, _(u'テンプレートを作る') + u'\tCtrl+T',
+        self.menuItem_make_template = wx.MenuItem(self.menu_file, wx.ID_ANY, _(u'テンプレートを作る') + '\tCtrl+T',
             wx.EmptyString, wx.ITEM_NORMAL)
         self.menu_file.Append(self.menuItem_make_template)
-        self.menubar.Append(self.menu_file, _(u'設定ファイル') + u'(&F)')
+        self.menubar.Append(self.menu_file, _(u'設定ファイル') + '(&F)')
 
         self.menu_edit = wx.Menu()
-        self.menuItem_cut = wx.MenuItem(self.menu_edit, wx.ID_ANY, _(u'カット') + u'\tCtrl+X',
+        self.menuItem_cut = wx.MenuItem(self.menu_edit, wx.ID_ANY, _(u'カット') + '\tCtrl+X',
             wx.EmptyString, wx.ITEM_NORMAL)
         self.menu_edit.Append(self.menuItem_cut)
-        self.menuItem_copy = wx.MenuItem(self.menu_edit, wx.ID_ANY, _(u'コピー') + u'\tCtrl+C',
+        self.menuItem_copy = wx.MenuItem(self.menu_edit, wx.ID_ANY, _(u'コピー') + '\tCtrl+C',
             wx.EmptyString, wx.ITEM_NORMAL)
         self.menu_edit.Append(self.menuItem_copy)
-        self.menuItem_paste = wx.MenuItem(self.menu_edit, wx.ID_ANY, _(u'ペースト') + u'\tCtrl+V',
+        self.menuItem_paste = wx.MenuItem(self.menu_edit, wx.ID_ANY, _(u'ペースト') + '\tCtrl+V',
             wx.EmptyString, wx.ITEM_NORMAL)
         self.menu_edit.Append(self.menuItem_paste)
-        self.menubar.Append(self.menu_edit, _(u'編集') + u'(&E)')
+        self.menubar.Append(self.menu_edit, _(u'編集') + '(&E)')
 
         self.menu_plot = wx.Menu()
-        self.menuItem_plot = wx.MenuItem(self.menu_plot, wx.ID_ANY, _(u'グラフをプロット') + u'\tCtrl+P',
+        self.menuItem_plot = wx.MenuItem(self.menu_plot, wx.ID_ANY, _(u'グラフをプロット') + '\tCtrl+P',
             wx.EmptyString, wx.ITEM_NORMAL)
         self.menu_plot.Append(self.menuItem_plot)
-        self.menuItem_plot_direct = wx.MenuItem(self.menu_plot, wx.ID_ANY, _(u'設定ファイルから直接プロット') + u'\tShift+Ctrl+P',
+        self.menuItem_plot_direct = wx.MenuItem(self.menu_plot, wx.ID_ANY, _(u'設定ファイルから直接プロット') + '\tShift+Ctrl+P',
             wx.EmptyString, wx.ITEM_NORMAL)
         self.menu_plot.Append(self.menuItem_plot_direct)
-        self.menubar.Append(self.menu_plot, _(u'プロット') + u'(&P)')
+        self.menubar.Append(self.menu_plot, _(u'プロット') + '(&P)')
 
         self.menu_help = wx.Menu()
         self.menuItem_update = wx.MenuItem(self.menu_help, wx.ID_ANY, _(u'アップデート'), wx.EmptyString, wx.ITEM_NORMAL)
         self.menu_help.Append(self.menuItem_update)
         self.menuItem_movie = wx.MenuItem(self.menu_help, wx.ID_ANY, _(u'使い方の動画'), wx.EmptyString, wx.ITEM_NORMAL)
         self.menu_help.Append(self.menuItem_movie)
-        self.menubar.Append(self.menu_help, _(u'ヘルプ') + u'(&H)')
+        self.menubar.Append(self.menu_help, _(u'ヘルプ') + '(&H)')
 
         self.SetMenuBar(self.menubar)
 
