@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 # matplotlibwx.py
 # by Yukiharu Iwamoto
-# 2025/4/2 4:40:25 PM
+# 2025/9/2 5:43:33 PM
 
 # Macの場合，文字入力後に引用符が勝手に変わったりしてうまく動かない．
 # 「システム環境設定」→「キーボード」→「ユーザー辞書」→「スマート引用符とスマートダッシュを使用」のチェックを外す．
 
-version = '2025/1/21 1:27:45 PM'
+version = '2025/9/2 5:43:33 PM'
 
 import os
 languages = os.environ.get('LANG')
@@ -56,6 +56,12 @@ def decode_if_necessary(s):
 
 def encode_if_necessary(s):
     return s.encode('CP932' if sys.platform == 'win32' else 'UTF-8') if sys.version_info.major <= 2 and type(s) is unicode else s
+
+def eval_exc(expression, globals = None, locals = None):
+    try:
+        eval(expression, globals, locals)
+    except:
+        print(sys.exc_info())
 
 # How to make translation
 # (1) mkdir -p locale/en/LC_MESSAGES
@@ -346,7 +352,7 @@ def data_from_file(file_name, columns = (1, 2), every = 1, skip = '#', delimiter
                                 columns1[i][j][1] += 1
                         else:
                             s += columns1[i][j]
-                    data[i].append(float(eval(s, param_dict)))
+                    data[i].append(float(eval_exc(s, param_dict)))
                     if data[i][-1] is None:
                         has_None = True
                 except:
@@ -411,7 +417,7 @@ def data_from_file(file_name, columns = (1, 2), every = 1, skip = '#', delimiter
                                 columns1[i][j][2] += 1
                         else:
                             s += columns1[i][j]
-                    data[i].append(float(eval(s, param_dict)))
+                    data[i].append(float(eval_exc(s, param_dict)))
                     if data[i][-1] is None:
                         has_None = True
                 except:
@@ -474,7 +480,7 @@ def data_from_file(file_name, columns = (1, 2), every = 1, skip = '#', delimiter
                                     s += line[k]
                             else:
                                 s += k
-                        data[i].append(float(eval(s, param_dict)))
+                        data[i].append(float(eval_exc(s, param_dict)))
                     if data[i][-1] is None:
                         has_None = True
                 except:
@@ -514,9 +520,9 @@ def data_from_equation(equation, param_dict = None):
 
     x = r[2]
     x_val = param_dict[x] if x in param_dict else None
-    x0 = float(eval(pat_math.sub(r'math.\1', r[3]), param_dict))
-    dx = float(eval(pat_math.sub(r'math.\1', r[4]), param_dict))
-    div_x = int(eval(pat_math.sub(r'math.\1', r[6]), param_dict))
+    x0 = float(eval_exc(pat_math.sub(r'math.\1', r[3]), param_dict))
+    dx = float(eval_exc(pat_math.sub(r'math.\1', r[4]), param_dict))
+    div_x = int(eval_exc(pat_math.sub(r'math.\1', r[6]), param_dict))
     if r[5] == '/':
         log_x = False
         dx = (dx - x0)/div_x
@@ -529,7 +535,7 @@ def data_from_equation(equation, param_dict = None):
         for i in range(div_x + 1):
             vx = x0*dx**i if log_x else x0 + dx*i
             param_dict[x] = vx
-            v = eval(eq, param_dict)
+            v = eval_exc(eq, param_dict)
             if isinstance(v, list):
                 data[0].append(float(v[0]))
                 data[1].append(float(v[1]))
@@ -538,9 +544,9 @@ def data_from_equation(equation, param_dict = None):
                 data[1].append(float(v))
     else: # y is not None
         y_val = param_dict[y] if y in param_dict else None
-        y0 = float(eval(pat_math.sub(r'math.\1', r[8]), param_dict))
-        dy = float(eval(pat_math.sub(r'math.\1', r[9]), param_dict))
-        div_y = int(eval(pat_math.sub(r'math.\1', r[11]), param_dict))
+        y0 = float(eval_exc(pat_math.sub(r'math.\1', r[8]), param_dict))
+        dy = float(eval_exc(pat_math.sub(r'math.\1', r[9]), param_dict))
+        div_y = int(eval_exc(pat_math.sub(r'math.\1', r[11]), param_dict))
         if r[10] == '/':
             log_y = False
             dy = (dy - y0)/div_y
@@ -555,7 +561,7 @@ def data_from_equation(equation, param_dict = None):
                 param_dict[x] = vx
                 data[0].append(vx)
                 data[1].append(vy)
-                v = eval(eq, param_dict)
+                v = eval_exc(eq, param_dict)
                 if isinstance(v, list):
                     data[2].append(float(v[0]))
                     data[3].append(float(v[1]))
