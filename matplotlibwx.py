@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 # matplotlibwx.py
 # by Yukiharu Iwamoto
-# 2025/9/2 7:19:44 PM
+# 2025/9/30 2:11:13 PM
 
 # Macの場合，文字入力後に引用符が勝手に変わったりしてうまく動かない．
 # 「システム環境設定」→「キーボード」→「ユーザー辞書」→「スマート引用符とスマートダッシュを使用」のチェックを外す．
 
-version = '2025/9/2 7:19:44 PM'
+version = '2025/9/30 2:11:13 PM'
 
 import os
 languages = os.environ.get('LANG')
@@ -839,25 +839,40 @@ def plot_scatter(data, err = (None, None), ranges = (None, None), ticks = (None,
                     smin = np.nanmin(z) if vmin is None else vmin
                     smax = np.nanmax(z) if vmax is None else vmax
                     if paint != '':
-                        sc = plt.scatter(data[0], data[1], marker = marker,
-                            s = marker_size + marker_size*(marker_size_ratio - 1.0)/(smax - smin)*(z - smin), c = z,
-                            edgecolors = marker_edge_color, label = label_in_legend, vmin = vmin, vmax = vmax,
-                            cmap = plt.get_cmap('jet' if paint == 'rainbow' else ('binary' if paint == 'wb' else
-                            ('gray' if paint == 'bw' else ('Reds' if paint == 'wR' else 'Blues')))),
-                            norm = matplotlib.colors.LogNorm() if ls else matplotlib.colors.Normalize(),
-                            zorder = zorder)
+                        if vmin is None or vmax is None:
+                            sc = plt.scatter(data[0], data[1], marker = marker,
+                                s = marker_size + marker_size*(marker_size_ratio - 1.0)/(smax - smin)*(z - smin), c = z,
+                                edgecolors = marker_edge_color, label = label_in_legend, vmin = vmin, vmax = vmax,
+                                cmap = plt.get_cmap('jet' if paint == 'rainbow' else ('binary' if paint == 'wb' else
+                                ('gray' if paint == 'bw' else ('Reds' if paint == 'wR' else 'Blues')))),
+                                norm = matplotlib.colors.LogNorm() if ls else matplotlib.colors.Normalize(),
+                                zorder = zorder)
+                        else:
+                            sc = plt.scatter(data[0], data[1], marker = marker,
+                                s = marker_size + marker_size*(marker_size_ratio - 1.0)/(smax - smin)*(z - smin), c = z,
+                                edgecolors = marker_edge_color, label = label_in_legend, vmin = vmin, vmax = vmax,
+                                cmap = plt.get_cmap('jet' if paint == 'rainbow' else ('binary' if paint == 'wb' else
+                                ('gray' if paint == 'bw' else ('Reds' if paint == 'wR' else 'Blues')))),
+                                zorder = zorder)
                         cbar = plt.colorbar(sc)
                     else:
                         sc = plt.scatter(data[0], data[1], marker = marker,
                             s = marker_size + marker_size*(marker_size_ratio - 1.0)/(smax - smin)*(z - smin),
                             c = marker_color, edgecolors = marker_edge_color, label = label_in_legend, zorder = zorder)
                 elif paint != '':
-                    sc = plt.scatter(data[0], data[1], marker = marker, s = marker_size, c = data[2],
-                        edgecolors = marker_edge_color, label = label_in_legend, vmin = vmin, vmax = vmax,
-                        cmap = plt.get_cmap('jet' if paint == 'rainbow' else ('binary' if paint == 'wb' else
-                        ('gray' if paint == 'bw' else ('Reds' if paint == 'wR' else 'Blues')))),
-                        norm = matplotlib.colors.LogNorm() if ls else matplotlib.colors.Normalize(),
-                        zorder = zorder)
+                    if vmin is None or vmax is None:
+                        sc = plt.scatter(data[0], data[1], marker = marker, s = marker_size, c = z,
+                            edgecolors = marker_edge_color, label = label_in_legend, vmin = vmin, vmax = vmax,
+                            cmap = plt.get_cmap('jet' if paint == 'rainbow' else ('binary' if paint == 'wb' else
+                            ('gray' if paint == 'bw' else ('Reds' if paint == 'wR' else 'Blues')))),
+                            norm = matplotlib.colors.LogNorm() if ls else matplotlib.colors.Normalize(),
+                            zorder = zorder)
+                    else:
+                        sc = plt.scatter(data[0], data[1], marker = marker, s = marker_size, c = z,
+                            edgecolors = marker_edge_color, label = label_in_legend, vmin = vmin, vmax = vmax,
+                            cmap = plt.get_cmap('jet' if paint == 'rainbow' else ('binary' if paint == 'wb' else
+                            ('gray' if paint == 'bw' else ('Reds' if paint == 'wR' else 'Blues')))),
+                            zorder = zorder)
                     cbar = plt.colorbar(sc)
             except:
                 print(sys.exc_info())
