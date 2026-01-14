@@ -1204,7 +1204,7 @@ def plot(dict_lists, show = True):
         plt.show()
 
 def evaluate_plot_settings(s, dir_name = u'.'):
-    s = ast.literal_eval('[' + s + '\n]')
+    s = ast.literal_eval('[' + s + '\n]') # '\n]'の'\n'は最終行がコメントの時に必要
     dir_name = correct_file_name_in_unicode(dir_name) # unicode
     for i in range(len(s)):
         for j in s[i].keys():
