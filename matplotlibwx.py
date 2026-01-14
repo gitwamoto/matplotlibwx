@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # matplotlibwx.py
 # by Yukiharu Iwamoto
-# 2025/9/30 2:11:13 PM
+# 2026/1/14 8:17:45 PM
 
 # Macの場合，文字入力後に引用符が勝手に変わったりしてうまく動かない．
 # 「システム環境設定」→「キーボード」→「ユーザー辞書」→「スマート引用符とスマートダッシュを使用」のチェックを外す．
@@ -1204,7 +1204,7 @@ def plot(dict_lists, show = True):
         plt.show()
 
 def evaluate_plot_settings(s, dir_name = u'.'):
-    s = ast.literal_eval('[' + s + '\n]')
+    s = ast.literal_eval('[' + s + ']')
     dir_name = correct_file_name_in_unicode(dir_name) # unicode
     for i in range(len(s)):
         for j in s[i].keys():
